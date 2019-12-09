@@ -28,16 +28,48 @@ void add_to_end(list * l, void * data);
 
 void add_to_meta_list_at(unsigned int index, list * base, char_array * data);
 
+void foo(char_array2d* args);
+list *do_the_phase_ONE(list *meta_list);
+void do_the_phase_DOS(list* meta_list); //TODO
+
 
 int main(int argc, char ** argv){
 	printf("Hallo Welt!");
 	char_array2d* values;
-	parse_args(argc, argv, values); //TODO: wert007
+	parse_args(argc, argv, &values); //TODO: wert007
 	foo(values);
 	return 0;
 }
 
-
+void parse_args(int argc, char ** argv, char_array2d** values)
+{
+	int length = argc - 1;
+	*values = malloc(sizeof(char_array2d));
+	(*values)->length = length;
+	(*values)->data = malloc(length * sizeof(char_array));
+	for(int i = 0; i < length; i++)
+	{
+		char_array* cur =malloc(sizeof(char_array));
+		cur->length = strlen(argv[i]);
+		cur->data = calloc(length, sizeof(char));
+		for(int c = 0; c < cur->length; c++)
+		{
+			switch(argv[i][c])
+			{
+				//TODO: Use aB-Cde
+				case '1':
+					cur->data[i] = 1;
+					break;
+				case '0':
+					cur->data[i] = 0;
+					break;
+				case '-':
+					cur->data[i] = 3;
+					break;
+			}
+		}
+	}
+}
 
 void foo(char_array2d* args)
 {
