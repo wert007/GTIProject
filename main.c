@@ -1,6 +1,73 @@
 #include <stdio.h>
 
-int main(){
+typedef struct {
+	unsigned int length;
+	char* data; //KEIN STRING. ZAHLEN!
+} char_array;
+
+typedef struct {
+	unsigned int length;
+	char_array* data; //KEIN STRING. ZAHLEN!
+} char_array2d;
+
+typedef struct node {
+	struct node * next;
+	char_array data;
+} node;
+
+typedef struct {
+	node* root;
+	unsigned int length;
+} char_array_list;
+
+int main(int argc, char ** argv){
 	printf("Hallo Welt!");
+	char_array2d* values;
+	parseArgs(argc, argv, values);
+	foo(values);
 	return 0;
+}
+
+void foo(char_array2d* args)
+{
+	listOfLists _list;
+	for(int i = 0; i < args->length; i++)
+	{
+		int ones = countOnes(args->data[i]);
+		addToListOfListAt(ones, _list, args->data[i]);
+	}
+	subFoo(_list);
+}
+
+void subFoo(listOfLists _list)
+{
+	bool success = false;
+	listOfLists newList;
+	for(int i = 0; i < _list.length - 1; i++)
+	{
+		list current = _list.data[i];
+		list next = _list.data[i + 1];
+		compare(current, next, &success, &newList);
+		
+	}
+	if(success)
+	{
+		subFoo(newList);
+	}
+}
+
+void compare(list current, list next, bool * success, listOfLists * newList)
+{
+	
+}
+
+unsigned int countOnes(char_array component)
+{
+	unsigned int result = 0;
+	for(int i = 0; i < component.length; i++)
+	{
+		if(component.data[i] == 1)
+			result++;
+	}
+	return result;
 }
