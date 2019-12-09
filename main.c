@@ -138,6 +138,29 @@ void compare(unsigned int ones, list *current, list *next, bool * success, list 
 	}
 }
 
+int is_off_by_one_bit(char_array* currentComponent, char_array* nextComponent)
+{
+	int count = 0;
+	for(int i = 0;i < currentComponent->lenght;i++){
+		if(currentComponent.data[i] == nextComponent.data[i]) continue;
+		count+=1;
+	}
+	if(count == 1) return 1;
+	else return 0;
+}
+
+char_array * combine_components(char_array * currentComponent, char_array * nextComponent)
+{
+	char_array to_be_added = malloc((currentComponent->length)*sizeof(char));
+	for(int i = 0;i<currentComponent->lenght;i++){
+		if(currentComponent.data[i] != nextComponent.data[i]){
+			to_be_added.data[i] = 2;
+		}
+		else to_be_added.data[i] = currentComponent.data[i];
+	}
+	return to_be_added;
+}
+
 void add_to_meta_list_at(unsigned int index, list * base, char_array * data)
 {
 	while(base->length < index)
