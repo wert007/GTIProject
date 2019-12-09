@@ -44,6 +44,7 @@ void do_the_phase_DOS(list* meta_list); //TODO
 void parse_args(int argc, char ** argv, char_array2d** values);
 
 
+
 int main(int argc, char ** argv){
 	printf("Hallo Welt!\n");
 	char_array2d* values;
@@ -145,10 +146,8 @@ void compare(unsigned int ones, list *current, list *next, bool * success, list 
 		for(int j = 0; j < next->length; j++)
 		{
 			char_array* next_component = get_at(next, j)->data;
-			//TODO ranplax
 			if(is_off_by_one_bit(current_component, next_component))
 			{
-				//TODO ranplax
 				char_array* component = combine_components(current_component, next_component);	
 
 				add_to_meta_list_at(ones, new_meta_list, component);
