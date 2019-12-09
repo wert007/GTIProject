@@ -21,18 +21,18 @@ typedef struct {
 	unsigned int length;
 } list;
 
-node * getAt(list * l, unsigned int i);
-list * createEmptyList();
-node * createNode(void * data);
-void addToEnd(list * l, void * data);
+node * get_at(list * l, unsigned int i);
+list * create_empty_list();
+node * create_node(void * data);
+void add_to_end(list * l, void * data);
 
-void addToMetaListAt(unsigned int index, list * base, char_array * data);
+void add_to_meta_list_at(unsigned int index, list * base, char_array * data);
 
 
 int main(int argc, char ** argv){
 	printf("Hallo Welt!");
 	char_array2d* values;
-	parseArgs(argc, argv, values); //TODO: wert007
+	parse_args(argc, argv, values); //TODO: wert007
 	foo(values);
 	return 0;
 }
@@ -41,38 +41,38 @@ int main(int argc, char ** argv){
 
 void foo(char_array2d* args)
 {
-	list *_list = malloc(sizeof(list));
+	list *meta_list = malloc(sizeof(list));
 	for(int i = 0; i < args->length; i++)
 	{
-		int ones = countOnes(args->data[i]);
-		addToListOfListAt(ones, _list, &args->data[i]); //TODO wert007
+		int ones = count_ones(args->data[i]);
+		add_to_meta_list_at(ones, meta_list, &args->data[i]); //TODO wert007
 	}
-	_list = doThePhaseONE(_list);
-	doThePhaseDOS(_list); //T O D O
+	meta_list = do_the_phase_ONE(meta_list);
+	do_the_phase_DOS(meta_list); //T O D O
 }
 
-list *doThePhaseONE(list *_list)
+list *do_the_phase_ONE(list *meta_list)
 {
 	bool success = false;
-	list* newList = malloc(sizeof(list));
-	for(int i = 0; i < _list->length - 1; i++)
+	list* new_meta_list = malloc(sizeof(list));
+	for(int i = 0; i < meta_list->length - 1; i++)
 	{
 		//todo wert007
 		//should work..
-		list *current = getAt(_list, i)->data;
-		list *next = getAt(_list, i + 1)->data;
-		compare(i, current, next, &success, newList);
+		list *current = get_at(meta_list, i)->data;
+		list *next = get_at(meta_list, i + 1)->data;
+		compare(i, current, next, &success, new_meta_list);
 		
 	}
 	if(success)
 	{
-		doThePhaseONE(newList);
+		do_the_phase_ONE(new_meta_list);
 	}
-	freeList(_list);
-	return newList;
+	free_list(meta_list);
+	return new_meta_list;
 }
 
-void compare(unsigned int ones, list *current, list *next, bool * success, list * newList)
+void compare(unsigned int ones, list *current, list *next, bool * success, list * new_meta_list)
 {
 	if(current->length == 0 || next->length == 0)
 	{
@@ -82,41 +82,41 @@ void compare(unsigned int ones, list *current, list *next, bool * success, list 
 
 	for(int i = 0; i < current->length; i++)
 	{
-		bool currentInsertedIntoList = false;
-		char_array* currentComponent = getAt(current, i)->data;
+		bool is_current_inserted_into_list = false;
+		char_array* current_component = get_at(current, i)->data;
 		for(int j = 0; j < next->length; j++)
 		{
-			char_array* nextComponent = getAt(next, j)->data;
+			char_array* next_component = get_at(next, j)->data;
 			//TODO ranplax
-			if(OffByOneBit(currentComponent, nextComponent))
+			if(is_off_by_one_bit(current_component, next_component))
 			{
 				//TODO ranplax
-				char_array* component = combineComponents(currentComponent, nextComponent);	
+				char_array* component = combine_components(current_component, next_component);	
 
-				addToMetaListAt(ones, newList, component);
+				add_to_meta_list_at(ones, new_meta_list, component);
 				//current.data[i] 					[x]
-				currentInsertedIntoList = true;
+				is_current_inserted_into_list = true;
 				*success = true;
 			}
 		}
-		if(!currentInsertedIntoList)
+		if(!is_current_inserted_into_list)
 		{
-			addToMetaListAt(ones, newList, currentComponent);
+			add_to_meta_list_at(ones, new_meta_list, current_component);
 		}
 	}
 }
 
-void addToMetaListAt(unsigned int index, list * base, char_array * data)
+void add_to_meta_list_at(unsigned int index, list * base, char_array * data)
 {
 	while(base->length < index)
 	{
-		addToEnd(base, createEmptyList());
+		add_to_end(base, create_empty_list());
 	}
-	list * selected = getAt(base, index)->data;
-	addToEnd(selected, data);
+	list * selected = get_at(base, index)->data;
+	add_to_end(selected, data);
 }
 
-unsigned int countOnes(char_array component)
+unsigned int count_ones(char_array component)
 {
 	unsigned int result = 0;
 	for(int i = 0; i < component.length; i++)
@@ -127,7 +127,7 @@ unsigned int countOnes(char_array component)
 	return result;
 }
 
-list * createEmptyList()
+list * create_empty_list()
 {
 	list * result = malloc(sizeof(list*));
 	result->length = 0;
@@ -135,7 +135,7 @@ list * createEmptyList()
 	return result;
 }
 
-node * createNode(void * data)
+node * create_node(void * data)
 {
 	node * result = malloc(sizeof(node*));
 	result->next = NULL;
@@ -143,33 +143,31 @@ node * createNode(void * data)
 	return result;
 }
 
-node * getAtNode(node * n, unsigned int i)
+node * get_at_node(node * n, unsigned int i)
 {
 	if(i == 0)
 		return n;
-	return getAtNode(n->next, i - 1);
+	return get_at_node(n->next, i - 1);
 }
 
-node * getAt(list * l, unsigned int i)
+node * get_at(list * l, unsigned int i)
 {
-	return getAtNode(l->root, i);
+	return get_at_node(l->root, i);
 }
 
-
-
-void addToEndNode(node * n, void * data)
+void add_to_end_node(node * n, void * data)
 {
 	if(n->next != NULL)
-		addToEndNode(n->next, data);
+		add_to_end_node(n->next, data);
 	else
-		n->next = createNode(data);
+		n->next = create_node(data);
 }
 
-void addToEnd(list * l, void * data)
+void add_to_end(list * l, void * data)
 {
 	if(l->root == NULL)
-		l->root = createNode(data);
+		l->root = create_node(data);
 	else
-		addToEndNode(l->root, data);
+		add_to_end_node(l->root, data);
 	l->length = l->length + 1;
 }
