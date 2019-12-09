@@ -31,6 +31,9 @@ void add_to_meta_list_at(unsigned int index, list * base, char_array * data);
 void foo(char_array2d* args);
 list *do_the_phase_ONE(list *meta_list);
 void do_the_phase_DOS(list* meta_list); //TODO
+int is_off_by_one_bit(char_array*, char_array*);
+char_array * combine_components(char_array *, char_array *);
+
 
 
 int main(int argc, char ** argv){
@@ -119,10 +122,8 @@ void compare(unsigned int ones, list *current, list *next, bool * success, list 
 		for(int j = 0; j < next->length; j++)
 		{
 			char_array* next_component = get_at(next, j)->data;
-			//TODO ranplax
 			if(is_off_by_one_bit(current_component, next_component))
 			{
-				//TODO ranplax
 				char_array* component = combine_components(current_component, next_component);	
 
 				add_to_meta_list_at(ones, new_meta_list, component);
@@ -154,7 +155,7 @@ char_array * combine_components(char_array * currentComponent, char_array * next
 	char_array to_be_added = malloc((currentComponent->length)*sizeof(char));
 	for(int i = 0;i<currentComponent->lenght;i++){
 		if(currentComponent.data[i] != nextComponent.data[i]){
-			to_be_added.data[i] = 2;
+			to_be_added.data[i] = 3;
 		}
 		else to_be_added.data[i] = currentComponent.data[i];
 	}
