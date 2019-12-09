@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdbool.h>
 
 typedef struct {
 	unsigned int length;
@@ -58,7 +59,31 @@ void subFoo(listOfLists _list)
 
 void compare(list current, list next, bool * success, listOfLists * newList)
 {
+	if(current.length == 0 || next.length == 0) return;
 	
+	for(int i = 0; i < current.length; i++)
+	{
+		bool currentInsertedIntoList = false;
+		for(int j = 0; j < next.length; j++)
+		{
+			if(OffByOneBit(current.data[i], next.data[j]))
+			{
+				//current.data[i] 					[x]
+				char_array* component = combineComponents(current.data[i], next.data[j]);	
+
+				int ones = countOnes(component);
+				addToListOfListAt(ones, newList, component);
+				currentInsertedIntoList = true;
+				*success = true;
+			}
+		}
+		if(!currentInsertedIntoList)
+		{
+			//TODO: We dont need to do that. Because that doesnt change
+			int ones = countOnes(current.data[i]);
+			addToListOfListAt(ones, newList, current.data[i]);
+		}
+	}
 }
 
 unsigned int countOnes(char_array component)
