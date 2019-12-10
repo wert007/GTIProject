@@ -32,7 +32,6 @@ void add_to_end(list * l, void * data);
 
 unsigned int count_ones(char_array component);
 void compare(unsigned int ones, list *current, list *next, bool * success, list * new_meta_list);
-//TODO naming conventions
 bool is_off_by_one_bit(char_array* currentComponent, char_array* nextComponent);
 char_array * combine_components(char_array * currentComponent, char_array * nextComponent);
 
@@ -137,13 +136,13 @@ void compare(unsigned int ones, list *current, list *next, bool * success, list 
 {
 	if(current->length == 0 || next->length == 0)
 	{
-		//TODO: How do we need to set success?
+		//TODO: How do we need to set success here? ?_?
 		return;
 	}
 
 	for(int i = 0; i < current->length; i++)
 	{
-		//TODO: Use something smarter.
+		//TODO: Use something smarter. o-o^
 		bool is_current_inserted_into_list = false;
 		char_array* current_component = get_at(current, i)->data;
 		for(int j = 0; j < next->length; j++)
@@ -153,7 +152,7 @@ void compare(unsigned int ones, list *current, list *next, bool * success, list 
 			printf("j = %d\n", j);
 			printf("current_component->length = %d\n", current_component->length);
 			printf("next_component->length = %d\n", next_component->length);
-			//TODO: Here we have segmentation faults.
+			//TODO: Here we have segmentation faults. >.<"
 			if(is_off_by_one_bit(current_component, next_component) && true)
 			{
 				char_array* component = combine_components(current_component, next_component);	
@@ -163,7 +162,7 @@ void compare(unsigned int ones, list *current, list *next, bool * success, list 
 				is_current_inserted_into_list = true;
 				*success = true;
 			}
-			//Maybe til here, but i'm not too sure ^^'
+			//Maybe til here, but i'm not too sure >^.^<
 
 		}
 		if(!is_current_inserted_into_list)
@@ -299,6 +298,10 @@ void add_to_end_node(node * n, void * data)
 		n->next = create_node(data);
 }
 
+//Since the segfault is in the 0th element
+//it could be something with lists?
+//and how we add our root element???
+//but i really don't know...
 void add_to_end(list * l, void * data)
 {
 	if(l->root == NULL)
