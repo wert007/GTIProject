@@ -311,3 +311,17 @@ void add_to_end(list * l, void * data)
 		add_to_end_node(l->root, data);
 	l->length = l->length + 1;
 }
+
+void print_map(list * results){
+	for(int i = 0; i < results->length; i++)
+	{
+		list *current = get_at(results, i)->data;
+		for(int j = 0;;j++)
+		{
+			if(current->data[j] == 1) printf("%d",(j+'a'));
+			if(current->data[j] == 0) printf("%d",(j+'A'));
+		}
+		if((i+1)<results->length) printf(" or ");
+		else printf("\n");
+	}
+}
