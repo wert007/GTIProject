@@ -325,3 +325,24 @@ void print_map(list * results){
 		else printf("\n");
 	}
 }
+//to be continued :D
+/*
+list * prime_implicant(list * to_check){
+	for(int i = 0;i<to_check->length;i++)
+	{
+		char_array * current = get_at(to_check,i)->data;
+		for(int j = 0;j<to_check->length;j++)
+		{
+			if(j!=i){
+			char_array * comp_array = get_at(to_check,j);
+			for(int k = 0;k<comp_array.length;k++)
+			{
+				if(current->data[k] == comp_array->data[k]){
+
+				}
+			}
+		}
+	}
+	return;
+}
+*/
