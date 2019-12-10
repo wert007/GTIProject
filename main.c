@@ -156,7 +156,7 @@ void compare(unsigned int ones, list *current, list *next, bool * success, list 
 			printf("not in get_at =)\n");
 
 			//TODO: Here we have segmentation faults.
-			if(is_off_by_one_bit(current_component, next_component))
+			if(is_off_by_one_bit(current_component, next_component) && true)
 			{
 				printf("not in is_off_by_one_bit =)\n");
 				char_array* component = combine_components(current_component, next_component);	
@@ -315,11 +315,11 @@ void add_to_end(list * l, void * data)
 void print_map(list * results){
 	for(int i = 0; i < results->length; i++)
 	{
-		list *current = get_at(results, i)->data;
+		char_array *current = get_at(results, i)->data;
 		for(int j = 0;;j++)
 		{
-			if(current->data[j] == 1) printf("%d",(j+'a'));
-			if(current->data[j] == 0) printf("%d",(j+'A'));
+			if(current->data[j] == 1) printf("%c",(j+'a'));
+			if(current->data[j] == 0) printf("%c",(j+'A'));
 		}
 		if((i+1)<results->length) printf(" or ");
 		else printf("\n");
