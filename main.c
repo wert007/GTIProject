@@ -116,18 +116,23 @@ list *do_the_phase_ONE(list *meta_list)
 	list* new_meta_list = malloc(sizeof(list));
 	for(int i = 0; i < meta_list->length - 1; i++)
 	{
+		printf("i = %d\n", i);
 		//todo wert007
 		//should work..
 		list *current = get_at(meta_list, i)->data;
 		list *next = get_at(meta_list, i + 1)->data;
+		printf("compare(%d, %p, %p, false, %p)\n", i, current, next, new_meta_list);
 		compare(i, current, next, &success, new_meta_list);
-		
+		printf("no error in compare\n");
 	}
+	printf("one times phase one donee.\n");
+	free_meta_list(meta_list);
+	printf("free all the meta lists!.\n");
 	if(success)
 	{
 		do_the_phase_ONE(new_meta_list);
+		printf("recursion called!\n");
 	}
-	free_meta_list(meta_list);
 	return new_meta_list;
 }
 
@@ -141,20 +146,31 @@ void compare(unsigned int ones, list *current, list *next, bool * success, list 
 
 	for(int i = 0; i < current->length; i++)
 	{
+		//TODO: Use something smarter.
 		bool is_current_inserted_into_list = false;
 		char_array* current_component = get_at(current, i)->data;
 		for(int j = 0; j < next->length; j++)
 		{
+			printf("is a error here?\n");
 			char_array* next_component = get_at(next, j)->data;
+			printf("not in get_at =)\n");
+
+			//TODO: Here we have segmentation faults.
 			if(is_off_by_one_bit(current_component, next_component))
 			{
+				printf("not in is_off_by_one_bit =)\n");
 				char_array* component = combine_components(current_component, next_component);	
 
+				printf("not in combine_components =)\n");
 				add_to_meta_list_at(ones, new_meta_list, component);
+				printf("not in add_to_meta_list_at =)\n");
 				//current.data[i] 					[x]
 				is_current_inserted_into_list = true;
 				*success = true;
 			}
+			//Maybe til here, but i'm not too sure ^^'
+			printf("no error here\n");
+
 		}
 		if(!is_current_inserted_into_list)
 		{
@@ -174,10 +190,17 @@ bool is_off_by_one_bit(char_array* currentComponent, char_array* nextComponent)
 	else return false;
 }
 
+char_array * create_empty_char_array(unsigned int length)
+{
+	char_array * result = malloc(sizeof(char_array));
+	result->length = length;
+	result->data = malloc(length * sizeof(char));
+	return result;
+}
+
 char_array * combine_components(char_array * currentComponent, char_array * nextComponent)
 {
-	char_array * to_be_added = malloc(sizeof(char_array));
-	to_be_added->data = malloc((currentComponent->length)*sizeof(char));
+	char_array * to_be_added = create_empty_char_array(currentComponent->length);
 	for(int i = 0;i<currentComponent->length;i++){
 		if(currentComponent->data[i] != nextComponent->data[i])
 			to_be_added->data[i] = 2;
@@ -235,7 +258,8 @@ void free_meta_list_node(node * n)
 
 void free_meta_list(list * meta_list)
 {
-	free_meta_list_node(meta_list->root);
+	if(meta_list->root != NULL)
+		free_meta_list_node(meta_list->root);
 	free(meta_list);
 }
 
@@ -249,7 +273,8 @@ void free_list_node(node * n)
 
 void free_list(list * l)
 {
-	free_list_node(l->root);
+	if(l->root != NULL)
+		free_list_node(l->root);
 	free(l);
 }
 
@@ -257,6 +282,11 @@ node * get_at_node(node * n, unsigned int i)
 {
 	if(i == 0)
 		return n;
+	if(n->next == NULL)
+	{
+		fprintf(stderr, "Out ouf bounds exception: index was %d to large.", i);
+		return NULL;
+	}
 	return get_at_node(n->next, i - 1);
 }
 
