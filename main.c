@@ -74,7 +74,7 @@ void parse_args(int argc, char ** argv, char_array2d** values)
 					cur->data[c] = 0;
 					break;
 				case '-':
-					cur->data[c] = 3;
+					cur->data[c] = 2;
 					break;
 				default:
 					printf(">%d<", argv[i + 1][c]);
@@ -322,23 +322,10 @@ void print_map(list * results){
 	}
 }
 //to be continued :D
-/*
-list * prime_implicant(list * to_check){
-	for(int i = 0;i<to_check->length;i++)
-	{
-		char_array * current = get_at(to_check,i)->data;
-		for(int j = 0;j<to_check->length;j++)
-		{
-			if(j!=i){
-			char_array * comp_array = get_at(to_check,j);
-			for(int k = 0;k<comp_array.length;k++)
-			{
-				if(current->data[k] == comp_array->data[k]){
 
-				}
-			}
-		}
-	}
+list * prime_implicant(char_array2d * to_check)
+{
+
+	
 	return;
 }
-*/
