@@ -45,19 +45,8 @@ void parse_args(int argc, char ** argv, char_array2d** values);
 
 
 int main(int argc, char ** argv){
-	printf("Hallo Welt!\n");
 	char_array2d* values;
 	parse_args(argc, argv, &values); //TODO: wert007
-	printf("values = ");
-	for(int x = 0; x < values->length; x++)
-	{
-		for(int c = 0; c < values->data[x]->length; c++)
-		{
-			printf("%c", values->data[x]->data[c] + '0');
-		}
-		printf(", ");
-	}
-	printf("\n");
 	foo(values);
 	return 0;
 }
@@ -104,7 +93,26 @@ void foo(char_array2d* args)
 		int ones = count_ones(*args->data[i]);
 		add_to_meta_list_at(ones, meta_list, args->data[i]); //TODO wert007
 	}
-	meta_list = do_the_phase_ONE(meta_list);
+	for(int i = 0;i<meta_list->length;i++){
+		list * new_list = get_at(meta_list,i)->data;
+		for(int j = 0;j<new_list->length;j++){
+			char_array * new_arr = get_at(new_list,j)->data;
+			for(int p = 0;p<new_arr->length;p++){
+			}
+		}
+	}meta_list = do_the_phase_ONE(meta_list);
+
+
+	for(int i = 0;i<meta_list->length;i++){
+		list * c = get_at(meta_list,i)->data;
+		for(int j = 0;j<c->length;j++){
+			char_array * p = get_at(c,j)->data;
+			for(int k = 0;k<p->length;k++){
+				printf("%i",p->data[k]);
+			}
+			printf("\n");
+		}
+	}
 	//do_the_phase_DOS(meta_list); //T O D O
 }
 
@@ -112,7 +120,6 @@ list *do_the_phase_ONE(list *meta_list)
 {
 	static int recursionDepth = 0;
 	recursionDepth++;
-	printf("recursionDepth = %d\n", recursionDepth);
 	bool success = false;
 	list* new_meta_list = create_empty_list();
 	for(int i = 0; i < meta_list->length - 1; i++)
@@ -123,7 +130,7 @@ list *do_the_phase_ONE(list *meta_list)
 
 		compare(i, current, next, &success, new_meta_list);
 	}
-	free_meta_list(meta_list);
+	//free_meta_list(meta_list);
 	if(success)
 	{
 		do_the_phase_ONE(new_meta_list);
@@ -147,23 +154,19 @@ void compare(unsigned int ones, list *current, list *next, bool * success, list 
 		for(int j = 0; j < next->length; j++)
 		{
 			char_array* next_component = get_at(next, j)->data;
-			printf("current_component->length = %d\n", current_component->length);
 			//TODO: Here we have segmentation faults. >.<"
 			if(is_off_by_one_bit(current_component, next_component) && true)
 			{
 				char_array* component = combine_components(current_component, next_component);	
-				printf("component->length = %d\n", component->length);
 				add_to_meta_list_at(ones, new_meta_list, component);
 				//current.data[i] 					[x]
 				is_current_inserted_into_list = true;
 				*success = true;
 			}
 			//Maybe til here, but i'm not too sure >^.^<
-
 		}
 		if(!is_current_inserted_into_list)
 		{
-			printf("current_component->length' = %d\n", current_component->length);
 			add_to_meta_list_at(ones, new_meta_list, current_component);
 		}
 	}
@@ -173,8 +176,8 @@ bool is_off_by_one_bit(char_array* currentComponent, char_array* nextComponent)
 {
 	int count = 0;
 	for(int i = 0;i < currentComponent->length;i++){
-		if(currentComponent->data[i] == nextComponent->data[i]) continue;
-		count+=1;
+		if(currentComponent->data[i] == nextComponent->data[i])continue;
+		else count+=1;
 	}
 	if(count == 1) return true;
 	else return false;
@@ -202,13 +205,11 @@ char_array * combine_components(char_array * currentComponent, char_array * next
 
 void add_to_meta_list_at(unsigned int index, list * base, char_array * data)
 {
-	printf("data->length = %d\n", data->length);
 	while(base->length <= index)
 	{
 		add_to_end(base, create_empty_list());
 	}
 	list * selected = get_at(base, index)->data;
-	printf("selected->length = %d\n", selected->length);
 	add_to_end(selected, data);
 }
 
