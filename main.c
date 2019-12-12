@@ -1,3 +1,5 @@
+//lol
+
 #include <stdio.h>
 #include <stdbool.h>
 #include <stdlib.h>
@@ -42,12 +44,7 @@ list *do_the_phase_ONE(list *meta_list);
 void do_the_phase_DOS(list* meta_list); //TODO
 void parse_args(int argc, char ** argv, char_array2d** values);
 
-<<<<<<< HEAD
-void print_map(list*);
-
-=======
 void print_char_array(char_array * arr);
->>>>>>> 0e5045a96ae8a29209ec3544f550af555f710547
 
 //#DEBUG
 unsigned long ToLong(char_array * arr)
@@ -118,7 +115,7 @@ void foo(char_array2d* args)
 		}
 	}meta_list = do_the_phase_ONE(meta_list);
 
-	/*
+
 	for(int i = 0;i<meta_list->length;i++){
 		list * c = get_at(meta_list,i)->data;
 		for(int j = 0;j<c->length;j++){
@@ -128,8 +125,7 @@ void foo(char_array2d* args)
 			}
 			printf("\n");
 		}
-	}*/
-	print_map(meta_list);
+	}
 	//do_the_phase_DOS(meta_list); //T O D O
 }
 
@@ -362,20 +358,16 @@ void add_to_end(list * l, void * data)
 }
 
 void print_map(list * results){
-	for(int i = 0;i<results->length;i++){
-		list * current = get_at(results,i)->data;
-		for(int j = 0;j<current->length;j++){
-			char_array * print_array = get_at(current,j)->data;
-			for(int p = 0;p<print_array->length;p++){
-				int v = print_array->data[p];
-				if(v == 1){
-					printf("%c",p+'a');
-				}else if(v == 0){
-					printf("%c",p+'A');
-				}
-			}
-			printf("\n");
+	for(int i = 0; i < results->length; i++)
+	{
+		char_array *current = get_at(results, i)->data;
+		for(int j = 0;;j++)
+		{
+			if(current->data[j] == 1) printf("%c",(j+'a'));
+			if(current->data[j] == 0) printf("%c",(j+'A'));
 		}
+		if((i+1)<results->length) printf(" or ");
+		else printf("\n");
 	}
 }
 //to be continued :D
