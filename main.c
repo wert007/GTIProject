@@ -114,18 +114,9 @@ void foo(char_array2d* args)
 			}
 		}
 	}meta_list = do_the_phase_ONE(meta_list);
+	print_map(meta_list);
 
 
-	for(int i = 0;i<meta_list->length;i++){
-		list * c = get_at(meta_list,i)->data;
-		for(int j = 0;j<c->length;j++){
-			char_array * p = get_at(c,j)->data;
-			for(int k = 0;k<p->length;k++){
-				printf("%i",p->data[k]);
-			}
-			printf("\n");
-		}
-	}
 	//do_the_phase_DOS(meta_list); //T O D O
 }
 
@@ -358,18 +349,20 @@ void add_to_end(list * l, void * data)
 }
 
 void print_map(list * results){
-	for(int i = 0; i < results->length; i++)
-	{
-		char_array *current = get_at(results, i)->data;
-		for(int j = 0;;j++)
-		{
-			if(current->data[j] == 1) printf("%c",(j+'a'));
-			if(current->data[j] == 0) printf("%c",(j+'A'));
+	for (int i = 0;i<results->length;i++){
+		list * current = get_at(results,i)->data;
+		for(int j = 0;j<current->length;j++){
+			char_array * print_array = get_at(current,j)->data;
+			for(int k = 0;k<print_array->length;k++){
+				int v = print_array->data[k];
+				if(v == 1) printf("%c",k+'A');
+				else if (v == 0) printf("%c",k+'a');
+			}
+			printf("\n");
 		}
-		if((i+1)<results->length) printf(" or ");
-		else printf("\n");
 	}
 }
+	
 //to be continued :D
 
 list * prime_implicant(char_array2d * to_check)
@@ -378,3 +371,4 @@ list * prime_implicant(char_array2d * to_check)
 	
 	return;
 }
+
