@@ -31,7 +31,7 @@ void free_meta_list(list * meta_list);
 void add_to_end(list * l, void * data);
 
 unsigned int count_ones(char_array component);
-void compare(unsigned int ones, list *current, list *next, bool * success, list * new_meta_list);
+void compare(unsigned int ones, list *current, list *next, bool * success, list * new_meta_list, bool is_last);
 bool is_off_by_one_bit(char_array* currentComponent, char_array* nextComponent);
 char_array * combine_components(char_array * currentComponent, char_array * nextComponent);
 
@@ -42,7 +42,18 @@ list *do_the_phase_ONE(list *meta_list);
 void do_the_phase_DOS(list* meta_list); //TODO
 void parse_args(int argc, char ** argv, char_array2d** values);
 
+void print_char_array(char_array * arr);
 
+//#DEBUG
+unsigned long ToLong(char_array * arr)
+{
+	unsigned long result = 0;
+	for(int i = 0; i < arr->length; i++)
+	{
+		result = result * 10 + arr->data[i];
+	}
+	return result;
+}
 
 int main(int argc, char ** argv){
 	char_array2d* values;
@@ -66,7 +77,7 @@ void parse_args(int argc, char ** argv, char_array2d** values)
 		{
 			switch(argv[i + 1][c])
 			{
-				//TODO: Use aB-Cde
+				//TODO: Use aBCde
 				case '1':
 					cur->data[c] = 1;
 					break;
@@ -118,8 +129,6 @@ void foo(char_array2d* args)
 
 list *do_the_phase_ONE(list *meta_list)
 {
-	static int recursionDepth = 0;
-	recursionDepth++;
 	bool success = false;
 	list* new_meta_list = create_empty_list();
 	for(int i = 0; i < meta_list->length - 1; i++)
@@ -128,20 +137,38 @@ list *do_the_phase_ONE(list *meta_list)
 		list *current = get_at(meta_list, i)->data;
 		list *next = get_at(meta_list, i + 1)->data;
 
-		compare(i, current, next, &success, new_meta_list);
+		compare(i, current, next, &success, new_meta_list, (i == meta_list->length - 2));
 	}
-	//free_meta_list(meta_list);
+	//TODO: Obv Memory Leak o_O
+	compare(meta_list->length - 1, get_at(meta_list, meta_list->length - 1)->data, create_empty_list(), &success, new_meta_list, true);
+
 	if(success)
 	{
-		do_the_phase_ONE(new_meta_list);
+		//Bigger TODO: Why does this not work???
+		//	return do_the_phase_ONE(new_meta_list);
+		list * temp_meta_list = do_the_phase_ONE(new_meta_list);
+		if(temp_meta_list->length > 0)
+			return temp_meta_list;
+		//printf("recursion-meta_list->length = %d\n", temp_meta_list->length);
 	}
 	return new_meta_list;
 }
 
-void compare(unsigned int ones, list *current, list *next, bool * success, list * new_meta_list)
+void compare(unsigned int ones, list *current, list *next, bool * success, list * new_meta_list, bool isLast)
 {
 	if(current->length == 0 || next->length == 0)
 	{
+		if(isLast)
+		{
+				for(int i = 0; i < current->length; i++)
+				{
+					add_to_meta_list_at(ones, new_meta_list, get_at(current, i)->data);
+				}
+				for(int i = 0; i < next->length; i++)
+				{
+					add_to_meta_list_at(ones, new_meta_list, get_at(next, i)->data);
+				}
+		}
 		//TODO: How do we need to set success here? ?_?
 		return;
 	}
@@ -151,10 +178,19 @@ void compare(unsigned int ones, list *current, list *next, bool * success, list 
 		//TODO: Use something smarter. o-o^
 		bool is_current_inserted_into_list = false;
 		char_array* current_component = get_at(current, i)->data;
+		if(ToLong(current_component) == 1211)
+		{
+			printf("smth is happening here! i = %d\n", i);
+		}
 		for(int j = 0; j < next->length; j++)
 		{
 			char_array* next_component = get_at(next, j)->data;
-			//TODO: Here we have segmentation faults. >.<"
+			
+		if(ToLong(next_component) == 1211)
+		{
+			printf("smth is happening here!\n");
+		}
+
 			if(is_off_by_one_bit(current_component, next_component) && true)
 			{
 				char_array* component = combine_components(current_component, next_component);	
@@ -167,8 +203,19 @@ void compare(unsigned int ones, list *current, list *next, bool * success, list 
 		}
 		if(!is_current_inserted_into_list)
 		{
+			printf("got here with ");
+			print_char_array(current_component);
+			printf("\n");
 			add_to_meta_list_at(ones, new_meta_list, current_component);
 		}
+	}
+}
+
+void print_char_array(char_array * arr)
+{
+	for(int c = 0; c < arr->length; c++)
+	{
+		printf("%d", arr->data[c]);
 	}
 }
 
