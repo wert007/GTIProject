@@ -7,6 +7,7 @@
 
 typedef struct {
 	unsigned int length;
+	bool has_been_compared;
 	char* data; //KEIN STRING. ZAHLEN!
 } char_array;
 
@@ -33,19 +34,19 @@ void free_meta_list(list * meta_list);
 void add_to_end(list * l, void * data);
 
 unsigned int count_ones(char_array component);
-void compare(unsigned int ones, list *current, list *next, bool * success, list * new_meta_list, bool is_last);
+void compare(unsigned int ones, list *current, list *next, list * , list * new_meta_list);
 bool is_off_by_one_bit(char_array* currentComponent, char_array* nextComponent);
 char_array * combine_components(char_array * currentComponent, char_array * nextComponent);
 
 void add_to_meta_list_at(unsigned int index, list * base, char_array * data);
 
 void foo(char_array2d* args);
-list *do_the_phase_ONE(list *meta_list);
+list *do_the_phase_ONE(list *meta_list,list *);
 void do_the_phase_DOS(list* meta_list); //TODO
 void parse_args(int argc, char ** argv, char_array2d** values);
 
 void print_char_array(char_array * arr);
-
+void print_map(list*);
 //#DEBUG
 unsigned long ToLong(char_array * arr)
 {
@@ -74,6 +75,7 @@ void parse_args(int argc, char ** argv, char_array2d** values)
 	{
 		char_array* cur = malloc(sizeof(char_array));
 		cur->length = strlen(argv[i + 1]);
+		cur->has_been_compared = false;
 		cur->data = calloc(length, sizeof(char));
 		for(int c = 0; c < cur->length; c++)
 		{
@@ -101,6 +103,7 @@ void parse_args(int argc, char ** argv, char_array2d** values)
 void foo(char_array2d* args)
 {
 	list *meta_list = create_empty_list();// malloc(sizeof(list));
+	list *result_list = create_empty_list();
 	for(int i = 0; i < args->length; i++)
 	{
 		int ones = count_ones(*args->data[i]);
@@ -113,95 +116,63 @@ void foo(char_array2d* args)
 			for(int p = 0;p<new_arr->length;p++){
 			}
 		}
-	}meta_list = do_the_phase_ONE(meta_list);
+	}result_list = do_the_phase_ONE(meta_list,result_list);
 	print_map(meta_list);
 
 
 	//do_the_phase_DOS(meta_list); //T O D O
 }
 
-list *do_the_phase_ONE(list *meta_list)
+list *do_the_phase_ONE(list *meta_list,list * result_list)
 {
 	bool success = false;
-	list* new_meta_list = create_empty_list();
 	for(int i = 0; i < meta_list->length - 1; i++)
 	{
-		//todo wert007
 		list *current = get_at(meta_list, i)->data;
 		list *next = get_at(meta_list, i + 1)->data;
-
-		compare(i, current, next, &success, new_meta_list, (i == meta_list->length - 2));
+		compare(i, current, next, result_list, meta_list);
 	}
-	//TODO: Obv Memory Leak o_O
-	compare(meta_list->length - 1, get_at(meta_list, meta_list->length - 1)->data, create_empty_list(), &success, new_meta_list, true);
+	list * current = get_at(meta_list,meta_list->length-2)->data;
+	compare(meta_list->length - 1, current, create_empty_list(), result_list,meta_list);
 
-	if(success)
-	{
-		//Bigger TODO: Why does this not work???
-		//	return do_the_phase_ONE(new_meta_list);
-		list * temp_meta_list = do_the_phase_ONE(new_meta_list);
-		if(temp_meta_list->length > 0)
-			return temp_meta_list;
-		//printf("recursion-meta_list->length = %d\n", temp_meta_list->length);
+	for(int i = 0;i<meta_list->length;i++){
+		list * comp_list = get_at(meta_list,i)->data;
+		for(int j = 0;j<comp_list->length;j++){
+			char_array * comp_arr = get_at(comp_list,j)->data;
+			if(comp_arr->has_been_compared) {
+				success = true;
+				goto dontdothis;
+			}
+		}
 	}
-	return new_meta_list;
+	dontdothis:;
+	if(success){
+		do_the_phase_ONE(meta_list,result_list);
+		return result_list;
+	}
+	else return result_list;
 }
 
-void compare(unsigned int ones, list *current, list *next, bool * success, list * new_meta_list, bool isLast)
+void compare(unsigned int ones, list *current, list *next, list*result_list, list * meta_list)
 {
-	if(current->length == 0 || next->length == 0)
-	{
-		if(isLast)
-		{
-				for(int i = 0; i < current->length; i++)
-				{
-					add_to_meta_list_at(ones, new_meta_list, get_at(current, i)->data);
-				}
-				for(int i = 0; i < next->length; i++)
-				{
-					add_to_meta_list_at(ones, new_meta_list, get_at(next, i)->data);
-				}
-		}
-		//TODO: How do we need to set success here? ?_?
-		return;
-	}
-
-	for(int i = 0; i < current->length; i++)
-	{
-		//TODO: Use something smarter. o-o^
-		bool is_current_inserted_into_list = false;
-		char_array* current_component = get_at(current, i)->data;
-		if(ToLong(current_component) == 1211)
-		{
-			printf("smth is happening here! i = %d\n", i);
-		}
-		for(int j = 0; j < next->length; j++)
-		{
-			char_array* next_component = get_at(next, j)->data;
-			
-		if(ToLong(next_component) == 1211)
-		{
-			printf("smth is happening here!\n");
-		}
-
-			if(is_off_by_one_bit(current_component, next_component) && true)
-			{
-				char_array* component = combine_components(current_component, next_component);	
-				add_to_meta_list_at(ones, new_meta_list, component);
-				//current.data[i] 					[x]
-				is_current_inserted_into_list = true;
-				*success = true;
+	for(int i = 0;i<current->length;i++){
+		char_array * current_component = get_at(current,i)->data;
+		for(int j = 0;j<next->length;j++){
+			char_array * next_component = get_at(next,j)->data;
+			if(is_off_by_one_bit(current_component,next_component)){
+				current_component->has_been_compared = true;
+				next_component->has_been_compared = true;
+				char_array * component = combine_components(current_component,next_component);
 			}
-			//Maybe til here, but i'm not too sure >^.^<
-		}
-		if(!is_current_inserted_into_list)
-		{
-			printf("got here with ");
-			print_char_array(current_component);
-			printf("\n");
-			add_to_meta_list_at(ones, new_meta_list, current_component);
 		}
 	}
+	for(int i = 0;i<current->length;i++){
+		char_array * current_component = get_at(current,i)->data;
+	 	if(!current_component->has_been_compared)
+	 	{
+	 		add_to_end(result_list, current_component);
+	 	}
+	 }
 }
 
 void print_char_array(char_array * arr)
@@ -227,6 +198,7 @@ char_array * create_empty_char_array(unsigned int length)
 {
 	char_array * result = malloc(sizeof(char_array));
 	result->length = length;
+	result->has_been_compared = false;
 	result->data = malloc(length * sizeof(char));
 	return result;
 }
@@ -335,10 +307,6 @@ void add_to_end_node(node * n, void * data)
 		n->next = create_node(data);
 }
 
-//Since the segfault is in the 0th element
-//it could be something with lists?
-//and how we add our root element???
-//but i really don't know...
 void add_to_end(list * l, void * data)
 {
 	if(l->root == NULL)
@@ -364,11 +332,11 @@ void print_map(list * results){
 }
 	
 //to be continued :D
-
+/*
 list * prime_implicant(char_array2d * to_check)
 {
 
 	
 	return;
-}
+}*/
 
