@@ -300,7 +300,6 @@ node * get_at_node(node * n, unsigned int i)
 		return n;
 	if(n->next == NULL)
 	{
-		printf("ERROR: Out ouf bounds exception: index was %d to large.", i);
 		return NULL;
 	}
 	return get_at_node(n->next, i - 1);
@@ -329,19 +328,6 @@ void add_to_end(list * l, void * data)
 }
 
 void print_map(list * results){
-	/*for (int i = 0;i<results->length;i++){
-		list * current = get_at(results,i)->data;
-		for(int j = 0;j<current->length;j++){
-			char_array * print_array = get_at(current,j)->data;
-			for(int k = 0;k<print_array->length;k++){
-				int v = print_array->data[k];
-				if(v == 1) printf("%c",k+'A');
-				else if (v == 0) printf("%c",k+'a');
-			}
-			printf("\n");
-		}
-	}
-}*/
 	for(int i = 0;i<results->length;i++){
 		char_array * current_arr = get_at(results,i)->data;
 		for(int j = 0;j<current_arr->length;j++){
