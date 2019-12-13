@@ -47,16 +47,7 @@ void parse_args(int argc, char ** argv, char_array2d** values);
 
 void print_char_array(char_array * arr);
 void print_map(list*);
-//#DEBUG
-unsigned long ToLong(char_array * arr)
-{
-	unsigned long result = 0;
-	for(int i = 0; i < arr->length; i++)
-	{
-		result = result * 10 + arr->data[i];
-	}
-	return result;
-}
+void print_map_debug(list * results);
 
 int main(int argc, char ** argv){
 	char_array2d* values;
@@ -110,7 +101,8 @@ void foo(char_array2d* args)
 		add_to_meta_list_at(ones, meta_list, args->data[i]); //TODO wert007
 	}
 	do_the_phase_ONE(meta_list,result_list);
-	print_map(result_list);
+	//print_map(result_list);
+	print_map_debug(result_list);
 
 
 	//do_the_phase_DOS(meta_list); //T O D O
@@ -354,6 +346,17 @@ void print_map(list * results){
 			int v = current_arr->data[j];
 			if(v == 1)printf("%c",j+'A');
 			else if(v == 0)printf("%c",j+'a');
+		}
+		printf("\n");
+	}
+}
+
+void print_map_debug(list * results){
+	for(int i = 0;i<results->length;i++){
+		char_array * current_arr = get_at(results,i)->data;
+		for(int j = 0;j<current_arr->length;j++){
+			int v = current_arr->data[j];
+			printf("%d", v);
 		}
 		printf("\n");
 	}
