@@ -34,14 +34,14 @@ void free_meta_list(list * meta_list);
 void add_to_end(list * l, void * data);
 
 unsigned int count_ones(char_array component);
-void compare(unsigned int ones, list *current, list *next, list * , list * new_meta_list);
+void compare(unsigned int ones, list *current, list *next, list * , list * ,list * new_meta_list);
 bool is_off_by_one_bit(char_array* currentComponent, char_array* nextComponent);
 char_array * combine_components(char_array * currentComponent, char_array * nextComponent);
 
 void add_to_meta_list_at(unsigned int index, list * base, char_array * data);
 
 void foo(char_array2d* args);
-list *do_the_phase_ONE(list *meta_list,list *);
+void do_the_phase_ONE(list *meta_list,list *);
 void do_the_phase_DOS(list* meta_list); //TODO
 void parse_args(int argc, char ** argv, char_array2d** values);
 
@@ -116,24 +116,25 @@ void foo(char_array2d* args)
 			for(int p = 0;p<new_arr->length;p++){
 			}
 		}
-	}result_list = do_the_phase_ONE(meta_list,result_list);
-	print_map(meta_list);
+	}do_the_phase_ONE(meta_list,result_list);
+	//print_map(result_list);
 
 
 	//do_the_phase_DOS(meta_list); //T O D O
 }
 
-list *do_the_phase_ONE(list *meta_list,list * result_list)
+void do_the_phase_ONE(list *meta_list,list * result_list)
 {
 	bool success = false;
+	list * new_meta_list = create_empty_list();
 	for(int i = 0; i < meta_list->length - 1; i++)
 	{
 		list *current = get_at(meta_list, i)->data;
 		list *next = get_at(meta_list, i + 1)->data;
-		compare(i, current, next, result_list, meta_list);
+		compare(i, current, next, result_list, meta_list,new_meta_list);
 	}
 	list * current = get_at(meta_list,meta_list->length-2)->data;
-	compare(meta_list->length - 1, current, create_empty_list(), result_list,meta_list);
+	compare(meta_list->length - 1, current, create_empty_list(), result_list,meta_list,new_meta_list);
 
 	for(int i = 0;i<meta_list->length;i++){
 		list * comp_list = get_at(meta_list,i)->data;
@@ -147,13 +148,13 @@ list *do_the_phase_ONE(list *meta_list,list * result_list)
 	}
 	dontdothis:;
 	if(success){
-		do_the_phase_ONE(meta_list,result_list);
-		return result_list;
+		do_the_phase_ONE(new_meta_list,result_list);
+		return;
 	}
-	else return result_list;
+	else return;
 }
 
-void compare(unsigned int ones, list *current, list *next, list*result_list, list * meta_list)
+void compare(unsigned int ones, list *current, list *next, list*result_list, list * meta_list, list * new_meta_list)
 {
 	for(int i = 0;i<current->length;i++){
 		char_array * current_component = get_at(current,i)->data;
@@ -163,6 +164,8 @@ void compare(unsigned int ones, list *current, list *next, list*result_list, lis
 				current_component->has_been_compared = true;
 				next_component->has_been_compared = true;
 				char_array * component = combine_components(current_component,next_component);
+				if(ones != 0) add_to_meta_list_at(ones -1,new_meta_list,component);
+				else add_to_meta_list_at(ones,new_meta_list,component);
 			}
 		}
 	}
