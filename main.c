@@ -109,14 +109,7 @@ void foo(char_array2d* args)
 		int ones = count_ones(*args->data[i]);
 		add_to_meta_list_at(ones, meta_list, args->data[i]); //TODO wert007
 	}
-	for(int i = 0;i<meta_list->length;i++){
-		list * new_list = get_at(meta_list,i)->data;
-		for(int j = 0;j<new_list->length;j++){
-			char_array * new_arr = get_at(new_list,j)->data;
-			for(int p = 0;p<new_arr->length;p++){
-			}
-		}
-	}do_the_phase_ONE(meta_list,result_list);
+	do_the_phase_ONE(meta_list,result_list);
 	print_map(result_list);
 
 
@@ -125,66 +118,89 @@ void foo(char_array2d* args)
 
 void do_the_phase_ONE(list *meta_list,list * result_list)
 {
-	if(meta_list!=NULL){
-		for(int i = 0;i<meta_list->length;i++){
+	if(meta_list->length!=0)
+	{
+		//Reset Loop
+		for(int i = 0;i<meta_list->length-1;i++)
+		{
 			list * current_list = get_at(meta_list,i)->data;
-			for(int j = 0;j<current_list->length;j++){
+			for(int j = 0;j<current_list->length;j++)
+			{
 				char_array * currentComp = get_at(current_list,j)->data;
 				currentComp->has_been_compared = false;
 			}
 		}
 		bool success = false;
 		list * new_meta_list = create_empty_list();
-		for(int i = 0; i < meta_list->length - 1; i++)
+
+		//Main Loop, compares the elemts with each other
+		for(int i = 0; i < meta_list->length-1; i++)
 		{
 			list *current = get_at(meta_list, i)->data;
 			list *next = get_at(meta_list, i + 1)->data;
 			compare(i, current, next, result_list, meta_list,new_meta_list);
 		}
+		//checks for last element if it was compared
 		list * current = get_at(meta_list,(meta_list->length-1))->data;
 		compare(meta_list->length - 1, current, create_empty_list(), result_list,meta_list,new_meta_list);
 
-		for(int i = 0;i<meta_list->length;i++){
+		//Loop to check, if at least one element has been compared
+		for(int i = 0;i<meta_list->length;i++)
+		{
 			list * comp_list = get_at(meta_list,i)->data;
-			for(int j = 0;j<comp_list->length;j++){
+			for(int j = 0;j<comp_list->length;j++)
+			{
 				char_array * comp_arr = get_at(comp_list,j)->data;
-				if(comp_arr->has_been_compared) {
+				if(comp_arr->has_been_compared)
+				{
 					success = true;
 					goto dontdothis;
 				}
 			}
 		}
-		dontdothis:;
-		if(success){
+		dontdothis:
+		//if so, run it again
+		if(success)
+		{
 			do_the_phase_ONE(new_meta_list,result_list);
 			return;
 		}
+		//else we are done
 		else return;
 	}return;
 }
 
 void compare(unsigned int ones, list *current, list *next, list*result_list, list * meta_list, list * new_meta_list)
 {
-	for(int i = 0;i<current->length;i++){
+	//Main Loop to compare elements
+	for(int i = 0;i<current->length;i++)
+	{
 		char_array * current_component = get_at(current,i)->data;
-		for(int j = 0;j<next->length;j++){
+		for(int j = 0;j<next->length;j++)
+		{
 			char_array * next_component = get_at(next,j)->data;
-			if(is_off_by_one_bit(current_component,next_component)){
+			//if there is only one digit differnt
+			if(is_off_by_one_bit(current_component,next_component))
+			{
 				current_component->has_been_compared = true;
 				next_component->has_been_compared = true;
 				char_array * component = combine_components(current_component,next_component);
+
+				//add the combined elemnts to new list
 				if(ones != 0) add_to_meta_list_at(ones -1,new_meta_list,component);
 				else add_to_meta_list_at(ones,new_meta_list,component);
 			}
 		}
 	}
-	for(int i = 0;i<current->length;i++){
+	//if the current element is not comparable, add it directly to the final list
+	for(int i = 0;i<current->length;i++)
+	{
 		char_array * current_component = get_at(current,i)->data;
 	 	if(!current_component->has_been_compared)
 	 	{
 	 		add_to_end(result_list, current_component);
 	 	}
-	 }
+	 }	
 }
 
 void print_char_array(char_array * arr)
@@ -198,12 +214,15 @@ void print_char_array(char_array * arr)
 bool is_off_by_one_bit(char_array* currentComponent, char_array* nextComponent)
 {
 	int count = 0;
-	for(int i = 0;i < currentComponent->length;i++){
+	for(int i = 0;i < currentComponent->length;i++)
+	{
 		if(currentComponent->data[i] == nextComponent->data[i])continue;
 		else count+=1;
 	}
-	if(count == 1) return true;
-	else return false;
+	if(count == 1) 
+		return true;
+	else 
+		return false;
 }
 
 char_array * create_empty_char_array(unsigned int length)
@@ -218,7 +237,8 @@ char_array * create_empty_char_array(unsigned int length)
 char_array * combine_components(char_array * currentComponent, char_array * nextComponent)
 {
 	char_array * to_be_added = create_empty_char_array(currentComponent->length);
-	for(int i = 0;i<currentComponent->length;i++){
+	for(int i = 0;i<currentComponent->length;i++)
+	{
 		if(currentComponent->data[i] != nextComponent->data[i])
 			to_be_added->data[i] = 2;
 		else 
