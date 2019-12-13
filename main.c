@@ -117,7 +117,7 @@ void foo(char_array2d* args)
 			}
 		}
 	}do_the_phase_ONE(meta_list,result_list);
-	//print_map(result_list);
+	print_map(result_list);
 
 
 	//do_the_phase_DOS(meta_list); //T O D O
@@ -125,33 +125,42 @@ void foo(char_array2d* args)
 
 void do_the_phase_ONE(list *meta_list,list * result_list)
 {
-	bool success = false;
-	list * new_meta_list = create_empty_list();
-	for(int i = 0; i < meta_list->length - 1; i++)
-	{
-		list *current = get_at(meta_list, i)->data;
-		list *next = get_at(meta_list, i + 1)->data;
-		compare(i, current, next, result_list, meta_list,new_meta_list);
-	}
-	list * current = get_at(meta_list,meta_list->length-2)->data;
-	compare(meta_list->length - 1, current, create_empty_list(), result_list,meta_list,new_meta_list);
-
-	for(int i = 0;i<meta_list->length;i++){
-		list * comp_list = get_at(meta_list,i)->data;
-		for(int j = 0;j<comp_list->length;j++){
-			char_array * comp_arr = get_at(comp_list,j)->data;
-			if(comp_arr->has_been_compared) {
-				success = true;
-				goto dontdothis;
+	if(meta_list!=NULL){
+		for(int i = 0;i<meta_list->length;i++){
+			list * current_list = get_at(meta_list,i)->data;
+			for(int j = 0;j<current_list->length;j++){
+				char_array * currentComp = get_at(current_list,j)->data;
+				currentComp->has_been_compared = false;
 			}
 		}
-	}
-	dontdothis:;
-	if(success){
-		do_the_phase_ONE(new_meta_list,result_list);
-		return;
-	}
-	else return;
+		bool success = false;
+		list * new_meta_list = create_empty_list();
+		for(int i = 0; i < meta_list->length - 1; i++)
+		{
+			list *current = get_at(meta_list, i)->data;
+			list *next = get_at(meta_list, i + 1)->data;
+			compare(i, current, next, result_list, meta_list,new_meta_list);
+		}
+		list * current = get_at(meta_list,(meta_list->length-1))->data;
+		compare(meta_list->length - 1, current, create_empty_list(), result_list,meta_list,new_meta_list);
+
+		for(int i = 0;i<meta_list->length;i++){
+			list * comp_list = get_at(meta_list,i)->data;
+			for(int j = 0;j<comp_list->length;j++){
+				char_array * comp_arr = get_at(comp_list,j)->data;
+				if(comp_arr->has_been_compared) {
+					success = true;
+					goto dontdothis;
+				}
+			}
+		}
+		dontdothis:;
+		if(success){
+			do_the_phase_ONE(new_meta_list,result_list);
+			return;
+		}
+		else return;
+	}return;
 }
 
 void compare(unsigned int ones, list *current, list *next, list*result_list, list * meta_list, list * new_meta_list)
@@ -320,7 +329,7 @@ void add_to_end(list * l, void * data)
 }
 
 void print_map(list * results){
-	for (int i = 0;i<results->length;i++){
+	/*for (int i = 0;i<results->length;i++){
 		list * current = get_at(results,i)->data;
 		for(int j = 0;j<current->length;j++){
 			char_array * print_array = get_at(current,j)->data;
@@ -331,6 +340,16 @@ void print_map(list * results){
 			}
 			printf("\n");
 		}
+	}
+}*/
+	for(int i = 0;i<results->length;i++){
+		char_array * current_arr = get_at(results,i)->data;
+		for(int j = 0;j<current_arr->length;j++){
+			int v = current_arr->data[j];
+			if(v == 1)printf("%c",j+'A');
+			else if(v == 0)printf("%c",j+'a');
+		}
+		printf("\n");
 	}
 }
 	
