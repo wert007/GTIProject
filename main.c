@@ -49,7 +49,7 @@ void add_to_meta_list_at(unsigned int index, list *base, char_array *data);
 
 void foo(char_array2d *args);
 void do_the_phase_ONE(list *meta_list, list *);
-void do_the_phase_DOS(list *meta_list); //TODO
+void do_the_phase_DOS(list * l);
 void parse_args(int argc, char **argv, char_array2d **values);
 
 void print_char_array(char_array *arr);
@@ -110,9 +110,10 @@ void foo(char_array2d *args)
 	}
 	do_the_phase_ONE(meta_list, result_list);
 	print_map(result_list);
+
 	//print_map_debug(result_list);
 
-	//do_the_phase_DOS(meta_list); //T O D O
+	do_the_phase_DOS(result_list); //T O D O
 }
 
 void do_the_phase_ONE(list *meta_list, list *result_list)
@@ -177,6 +178,15 @@ dontdothis:
 		}
 		remove_duplicates(result_list);
 	}
+}
+
+void do_the_phase_DOS(list * l)
+{
+	//TODO: IMplement Petrick's MEthod
+	char_array2d *table = convert_to_table(l);
+	//Collects essential implicants and transforms table
+	list * essentials = collect_essentials(table);
+
 }
 
 void compare(unsigned int ones, list *current, list *next, list *result_list, list *meta_list, list *new_meta_list)
