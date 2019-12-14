@@ -106,8 +106,8 @@ void foo(char_array2d *args)
 		add_to_meta_list_at(ones, meta_list, args->data[i]); //TODO wert007
 	}
 	do_the_phase_ONE(meta_list, result_list);
-	//print_map(result_list);
-	print_map_debug(result_list);
+	print_map(result_list);
+	//print_map_debug(result_list);
 
 	//do_the_phase_DOS(meta_list); //T O D O
 }
@@ -117,7 +117,7 @@ void do_the_phase_ONE(list *meta_list, list *result_list)
 	if (meta_list->length == 0)
 		return;
 	//Reset Loop
-	for (int i = 0; i < meta_list->length - 1; i++)
+	for (int i = 0; i < meta_list->length; i++)
 	{
 		list *current_list = get_at(meta_list, i)->data;
 		for (int j = 0; j < current_list->length; j++)
@@ -130,7 +130,7 @@ void do_the_phase_ONE(list *meta_list, list *result_list)
 	list *new_meta_list = create_empty_list();
 
 	//Main Loop, compares the elemts with each other
-	for (int i = 0; i < meta_list->length - 1; i++)
+	for (int i = 0; i < meta_list->length -1; i++)
 	{
 		list *current = get_at(meta_list, i)->data;
 		list *next = get_at(meta_list, i + 1)->data;
@@ -138,7 +138,7 @@ void do_the_phase_ONE(list *meta_list, list *result_list)
 	}
 	//checks for last element if it was compared
 	list *current = get_at(meta_list, (meta_list->length - 1))->data;
-	compare(meta_list->length - 1, current, create_empty_list(), result_list, meta_list, new_meta_list);
+	compare(meta_list->length, current, create_empty_list(), result_list, meta_list, new_meta_list);
 
 	//Loop to check, if at least one element has been compared
 	for (int i = 0; i < meta_list->length; i++)
@@ -159,13 +159,15 @@ dontdothis:
 	if (success)
 	{
 		do_the_phase_ONE(new_meta_list, result_list);
-	}
-	for(int i = 0; i < new_meta_list->length; i++)
+	}else
 	{
-		list* current = get_at(new_meta_list, i)->data;
-		for(int j = 0; j < current->length; j++)
+		for(int i = 0; i < new_meta_list->length; i++)
 		{
-			add_to_end(result_list, get_at(current, j)->data);
+			list* current = get_at(new_meta_list, i)->data;
+			for(int j = 0; j < current->length; j++)
+			{
+				add_to_end(result_list, get_at(current, j)->data);
+			}
 		}
 	}
 }
@@ -193,15 +195,11 @@ void compare(unsigned int ones, list *current, list *next, list *result_list, li
 		}
 	}
 	//if the current element is not comparable, add it directly to the final list
-
-	//Ok. Could it be. Could it be, that we actually might need those elements, that
-	//we didn't compare later again????
 	for (int i = 0; i < current->length; i++)
 	{
 		char_array *current_component = get_at(current, i)->data;
 		if (!current_component->has_been_compared)
 		{
-			//add_to_end(result_list, current_component);
 			int index = count_ones(*current_component);
 			add_to_meta_list_at(index, new_meta_list, current_component);
 		}
@@ -216,12 +214,17 @@ void print_char_array(char_array *arr)
 	}
 }
 
-bool is_off_by_one_bit(char_array *currentComponent, char_array *nextComponent)
+bool is_off_by_one_bit(char_array *current_component, char_array *next_component)
 {
 	int count = 0;
-	for (int i = 0; i < currentComponent->length; i++)
+	for (int i = 0; i < current_component->length; i++)
 	{
-		if (currentComponent->data[i] == nextComponent->data[i])
+		if((current_component->data[i] == 2) && (next_component->data[i] != 2))
+			{
+			count = 5;
+			break;
+			}
+		else if (current_component->data[i] == next_component->data[i])
 			continue;
 		else
 			count += 1;
@@ -384,12 +387,3 @@ void print_map_debug(list *results)
 		printf("\n");
 	}
 }
-
-//to be continued :D
-/*
-list * prime_implicant(char_array2d * to_check)
-{
-
-	
-	return;
-}*/
