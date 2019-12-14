@@ -129,7 +129,6 @@ void do_the_phase_ONE(list *meta_list, list *result_list)
 			currentComp->has_been_compared = false;
 		}
 	}
-	printf("\n---\n\n");
 	bool success = false;
 	list *new_meta_list = create_empty_list();
 
@@ -139,15 +138,14 @@ void do_the_phase_ONE(list *meta_list, list *result_list)
 		list *current = get_at(meta_list, i)->data;
 		list *next = get_at(meta_list, i + 1)->data;
 		compare(i, current, next, result_list, meta_list, new_meta_list);
-		remove_duplicates_meta(new_meta_list);
+		//remove_duplicates_meta(new_meta_list);
 	}
 	//checks for last element if it was compared
 	list *current = get_at(meta_list, (meta_list->length - 1))->data;
 	compare(meta_list->length, current, create_empty_list(), result_list, meta_list, new_meta_list);
-	remove_duplicates_meta(new_meta_list);
+	//remove_duplicates_meta(new_meta_list);
 
 
-	printf("lol\n");
 	//Loop to check, if at least one element has been compared
 	for (int i = 0; i < meta_list->length; i++)
 	{
@@ -177,6 +175,7 @@ dontdothis:
 				add_to_end(result_list, get_at(current, j)->data);
 			}
 		}
+		remove_duplicates(result_list);
 	}
 }
 
@@ -190,10 +189,6 @@ void compare(unsigned int ones, list *current, list *next, list *result_list, li
 		{
 			char_array *next_component = get_at(next, j)->data;
 			
-			printf("Comparing ");
-			print_char_array(current_component);
-			printf(" with ");
-			print_char_array(next_component);
 
 			//if there is only one digit differnt
 			if (is_off_by_one_bit(current_component, next_component))
@@ -201,13 +196,11 @@ void compare(unsigned int ones, list *current, list *next, list *result_list, li
 				current_component->has_been_compared = true;
 				next_component->has_been_compared = true;
 				char_array *component = combine_components(current_component, next_component);
-				printf(": matched to ");
-				print_char_array(component);
+			
 				//add the combined elemnts to new list
 				int newIndex = count_ones(*component);
 				add_to_meta_list_at(newIndex, new_meta_list, component);
 			}
-			printf("\n");
 		}
 	}
 	//if the current element is not comparable, add it directly to the final list
@@ -393,11 +386,7 @@ node * remove_at_node(node * n, unsigned int i)
 	}
 	else
 	{
-		if(n->next == NULL)
-		{
-			printf("ERROR: %d\n", i);
-		}
-		n->next = remove_at_node(n->next, i--);
+		n->next = remove_at_node(n->next, i - 1);
 		return n;
 	}
 }
@@ -417,10 +406,6 @@ void remove_duplicates(list * l)
 	for(int i = l->length - 2; i >= 0; i--)
 	{
 		char_array *current = get_at(l, i)->data;
-		if(i >= l->length)
-		{
-			printf("What jsust happend??\n");
-		}
 		for(int j = l->length - 1; j > i; j--)
 		{
 			char_array *other = get_at(l, j)->data;
