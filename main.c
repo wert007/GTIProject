@@ -359,9 +359,11 @@ void add_to_end(list *l, void *data)
 
 void print_map(list *results)
 {
+	int dont_care = 0;
 	for (int i = 0; i < results->length; i++)
 	{
 		char_array *current_arr = get_at(results, i)->data;
+		int count = 0;
 		for (int j = 0; j < current_arr->length; j++)
 		{
 			int v = current_arr->data[j];
@@ -369,9 +371,14 @@ void print_map(list *results)
 				printf("%c", j + 'A');
 			else if (v == 0)
 				printf("%c", j + 'a');
+			else count += 1;
 		}
-		printf("\n");
+		if(count != current_arr->length)
+			printf("\n");
+		else dont_care = 1;
 	}
+	if(dont_care != 0)
+		printf("it doesnt matter, always on :D\n");
 }
 
 void print_map_debug(list *results)
