@@ -186,7 +186,7 @@ void do_the_phase_DOS(list * l)
 	char_array2d *table = convert_to_table(l);
 	//Collects essential implicants and transforms table
 	list * essentials = collect_essentials(table);
-
+ 
 }
 
 void compare(unsigned int ones, list *current, list *next, list *result_list, list *meta_list, list *new_meta_list)
