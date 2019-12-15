@@ -68,10 +68,10 @@ void do_the_phase_ONE(list *meta_list, list *result_list)
 	//Reset Loop
 	for (int i = 0; i < meta_list->length; i++)
 	{
-		list *current_list = get_at(meta_list, i)->data;
+		list *current_list = get_at(meta_list, i);
 		for (int j = 0; j < current_list->length; j++)
 		{
-			char_array *currentComp = get_at(current_list, j)->data;
+			char_array *currentComp = get_at(current_list, j);
 			currentComp->has_been_compared = false;
 		}
 	}
@@ -81,23 +81,23 @@ void do_the_phase_ONE(list *meta_list, list *result_list)
 	//Main Loop, compares the elemts with each other
 	for (int i = 0; i < meta_list->length - 1; i++)
 	{
-		list *current = get_at(meta_list, i)->data;
-		list *next = get_at(meta_list, i + 1)->data;
+		list *current = get_at(meta_list, i);
+		list *next = get_at(meta_list, i + 1);
 		compare(i, current, next, result_list, meta_list, new_meta_list);
 		//remove_duplicates_meta(new_meta_list);
 	}
 	//checks for last element if it was compared
-	list *current = get_at(meta_list, (meta_list->length - 1))->data;
+	list *current = get_at(meta_list, (meta_list->length - 1));
 	compare(meta_list->length, current, create_empty_list(), result_list, meta_list, new_meta_list);
 	//remove_duplicates_meta(new_meta_list);
 
 	//Loop to check, if at least one element has been compared
 	for (int i = 0; i < meta_list->length; i++)
 	{
-		list *comp_list = get_at(meta_list, i)->data;
+		list *comp_list = get_at(meta_list, i);
 		for (int j = 0; j < comp_list->length; j++)
 		{
-			char_array *comp_arr = get_at(comp_list, j)->data;
+			char_array *comp_arr = get_at(comp_list, j);
 			if (comp_arr->has_been_compared)
 			{
 				success = true;
@@ -115,10 +115,10 @@ dontdothis:
 	{
 		for (int i = 0; i < new_meta_list->length; i++)
 		{
-			list *current = get_at(new_meta_list, i)->data;
+			list *current = get_at(new_meta_list, i);
 			for (int j = 0; j < current->length; j++)
 			{
-				add_to_end(result_list, get_at(current, j)->data);
+				add_to_end(result_list, get_at(current, j));
 			}
 		}
 		remove_duplicates(result_list);
@@ -131,7 +131,7 @@ bool is_meta_table_empty(list * meta_table)
 		return true;
 	for(int i = 0; i < meta_table->length; i++)
 	{
-		list * current = get_at(meta_table, i)->data;
+		list * current = get_at(meta_table, i);
 		if(current->length > 0)
 			return false;
 	}
@@ -157,7 +157,7 @@ list * do_the_phase_DOS(list *l, char_array2d *minterms)
 
 void remove_dominant_columns(list * meta_table) //(  ͡°  ͜ʖ  ͡° )
 {
-	list * current = get_at(meta_table, 0)->data;
+	list * current = get_at(meta_table, 0);
 	for(int x = current->length - 1; x >= 0; x--)
 	{
 		for(int x2 = current->length - 1; x2 >= 0; x2--)
@@ -166,9 +166,9 @@ void remove_dominant_columns(list * meta_table) //(  ͡°  ͜ʖ  ͡° )
 			bool should_be_removed = true;
 			for(int y = meta_table->length - 1; y >= 0; y--)
 			{
-				current = get_at(meta_table, y)->data;
-				char curVal = *(char *)get_at(current, x)->data;
-				char othVal = *(char *)get_at(current, x2)->data;
+				current = get_at(meta_table, y);
+				char curVal = *(char *)get_at(current, x);
+				char othVal = *(char *)get_at(current, x2);
 				if(curVal == 0 && othVal == 1)
 				{
 					should_be_removed = false;
@@ -187,16 +187,16 @@ void remove_submissive_rows(list * meta_table) //( ͡° ͜ʖ ͡°)
 {
 	for(int i = meta_table->length - 1; i >= 0; i--)
 	{
-		list * current = get_at(meta_table, i)->data;
+		list * current = get_at(meta_table, i);
 		for(int j = meta_table->length - 1; j >= 0; j--)
 		{
 			if(j == i)	continue;
-			list * other = get_at(meta_table, j)->data;
+			list * other = get_at(meta_table, j);
 			bool should_be_removed = true;
 			for(int k = 0; k < current->length; k++)
 			{
-				char curElem = *(char *)get_at(current, k)->data;
-				char othElem = *(char *)get_at(other, k)->data;
+				char curElem = *(char *)get_at(current, k);
+				char othElem = *(char *)get_at(other, k);
 				if(curElem == 1 && othElem == 0)
 					should_be_removed = false;
 			}
@@ -216,9 +216,10 @@ void collect_essentials(list *meta_table, list *result, list *primeimplicants)
 {
 	if(meta_table->length == 1)
 	{
-		list *l = get_at(primeimplicants, 0)->data;
-
-			add_to_end(result, l);
+		list *l = get_at(primeimplicants, 0);
+		add_to_end(result, l);
+		remove_at(meta_table, 0);
+		return;
 	}
 	list *conversion = create_empty_list();
 	for (int i = 0; i < primeimplicants->length; i++)
@@ -227,15 +228,15 @@ void collect_essentials(list *meta_table, list *result, list *primeimplicants)
 		copy[0] = i;
 		add_to_end(conversion, copy);
 	}
-	list *current = get_at(meta_table, 0)->data;
+	list *current = get_at(meta_table, 0);
 	for (int x = current->length - 1; x >= 0; x--)
 	{
 		int ones_in_row = 0;
 		int index_of_last_found = -1;
 		for (int y = 0; y < meta_table->length; y++)
 		{
-			current = get_at(meta_table, y)->data;
-			char val = *(char *)(get_at(current, x)->data);
+			current = get_at(meta_table, y);
+			char val = *(char *)(get_at(current, x));
 			if (val == 1)
 			{
 
@@ -245,14 +246,14 @@ void collect_essentials(list *meta_table, list *result, list *primeimplicants)
 		}
 		if (ones_in_row == 1)
 		{
-			int primIndex = *(int *)get_at(conversion, index_of_last_found)->data;
-			list *l = get_at(primeimplicants, primIndex)->data;
+			int primIndex = *(int *)get_at(conversion, index_of_last_found);
+			list *l = get_at(primeimplicants, primIndex);
 
 			add_to_end(result, l);
-			list *row = get_at(meta_table, index_of_last_found)->data;
+			list *row = get_at(meta_table, index_of_last_found);
 			for (int i = row->length - 1; i >= 0; i--)
 			{
-				char value = *(char *)get_at(row, i)->data;
+				char value = *(char *)get_at(row, i);
 				if (value == 1)
 				{
 					remove_column(meta_table, i);
@@ -263,7 +264,7 @@ void collect_essentials(list *meta_table, list *result, list *primeimplicants)
 
 			if(is_meta_table_empty(meta_table))
 				return;
-			current = get_at(meta_table, 0)->data;
+			current = get_at(meta_table, 0);
 		}
 	}
 }
@@ -277,7 +278,7 @@ void remove_column(list *meta_table, int index)
 {
 	for (int i = 0; i < meta_table->length; i++)
 	{
-		list *current = get_at(meta_table, i)->data;
+		list *current = get_at(meta_table, i);
 		remove_at(current, index);
 	}
 }
@@ -292,7 +293,7 @@ list *convert_to_table(list *primeimplicants, char_array2d *minterms)
 		add_to_end(result, current);
 		for (int x = 0; x < minterms->length; x++)
 		{
-			char_array *b = get_at(primeimplicants, y)->data;
+			char_array *b = get_at(primeimplicants, y);
 			char_array *a = minterms->data[x];
 
 			char *value = malloc(sizeof(char));
@@ -329,10 +330,10 @@ void compare(unsigned int ones, list *current, list *next, list *result_list, li
 	//Main Loop to compare elements
 	for (int i = 0; i < current->length; i++)
 	{
-		char_array *current_component = get_at(current, i)->data;
+		char_array *current_component = get_at(current, i);
 		for (int j = 0; j < next->length; j++)
 		{
-			char_array *next_component = get_at(next, j)->data;
+			char_array *next_component = get_at(next, j);
 
 			//if there is only one digit differnt
 			if (is_off_by_one_bit(current_component, next_component))
@@ -350,7 +351,7 @@ void compare(unsigned int ones, list *current, list *next, list *result_list, li
 	//if the current element is not comparable, add it directly to the final list
 	for (int i = 0; i < current->length; i++)
 	{
-		char_array *current_component = get_at(current, i)->data;
+		char_array *current_component = get_at(current, i);
 		if (!current_component->has_been_compared)
 		{
 			int index = count_ones(*current_component);
@@ -440,7 +441,7 @@ void add_to_meta_list_at(unsigned int index, list *base, char_array *data)
 	{
 		add_to_end(base, create_empty_list());
 	}
-	list *selected = get_at(base, index)->data;
+	list *selected = get_at(base, index);
 	add_to_end(selected, data);
 }
 
@@ -512,9 +513,9 @@ node *get_at_node(node *n, unsigned int i)
 	return get_at_node(n->next, i - 1);
 }
 
-node *get_at(list *l, unsigned int i)
+void *get_at(list *l, unsigned int i)
 {
-	return get_at_node(l->root, i);
+	return get_at_node(l->root, i)->data;
 }
 
 void add_to_end_node(node *n, void *data)
@@ -561,22 +562,13 @@ void remove_duplicates(list *l)
 {
 	for (int i = l->length - 2; i >= 0; i--)
 	{
-		char_array *current = get_at(l, i)->data;
+		char_array *current = get_at(l, i);
 		for (int j = l->length - 1; j > i; j--)
 		{
-			char_array *other = get_at(l, j)->data;
+			char_array *other = get_at(l, j);
 			if (equals(current, other) && i != j)
 				remove_at(l, i);
 		}
-	}
-}
-
-void remove_duplicates_meta(list *l)
-{
-	for (int i = 0; i < l->length; i++)
-	{
-		list *current = get_at(l, i)->data;
-		remove_duplicates(current);
 	}
 }
 
@@ -585,7 +577,7 @@ void print_map(list *results)
 	int dont_care = 0;
 	for (int i = 0; i < results->length; i++)
 	{
-		char_array *current_arr = get_at(results, i)->data;
+		char_array *current_arr = get_at(results, i);
 		int count = 0;
 		for (int j = 0; j < current_arr->length; j++)
 		{
@@ -604,18 +596,4 @@ void print_map(list *results)
 	}
 	if (dont_care != 0)
 		printf("it doesnt matter, always on :D\n");
-}
-
-void print_map_debug(list *results)
-{
-	for (int i = 0; i < results->length; i++)
-	{
-		char_array *current_arr = get_at(results, i)->data;
-		for (int j = 0; j < current_arr->length; j++)
-		{
-			int v = current_arr->data[j];
-			printf("%d", v);
-		}
-		printf("\n");
-	}
 }

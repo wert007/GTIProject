@@ -29,7 +29,7 @@ typedef struct
 	unsigned int length;
 } list;
 
-node *get_at(list *l, unsigned int i);
+void *get_at(list *l, unsigned int i);
 list *create_empty_list();
 node *create_node(void *data);
 void free_list(list *l);
