@@ -50,6 +50,10 @@ char_array *combine_components(char_array *currentComponent, char_array *nextCom
 bool a_can_be_converted_to_b(char_array *a, char_array *b);
 void remove_column(list *meta_table, int index);
 void remove_row(list *meta_table, int index);
+void remove_submissive_rows(list * meta_table); //( ͡° ͜ʖ ͡°)
+void remove_dominant_columns(list * meta_table); //( ͡° ͜ʖ ͡°)
+
+bool is_meta_table_empty(list * meta_table);
 
 void collect_essentials(list *meta_table, list *result, list *primeimplicants);
 
@@ -58,7 +62,7 @@ void add_to_meta_list_at(unsigned int index, list *base, char_array *data);
 
 void foo(char_array2d *args);
 void do_the_phase_ONE(list *meta_list, list *);
-void do_the_phase_DOS(list *l, char_array2d *minterms);
+list * do_the_phase_DOS(list *l, char_array2d *minterms);
 void parse_args(int argc, char **argv, char_array2d **values);
 
 void print_char_array(char_array *arr);
@@ -118,11 +122,11 @@ void foo(char_array2d *args)
 		add_to_meta_list_at(ones, meta_list, args->data[i]); //TODO wert007
 	}
 	do_the_phase_ONE(meta_list, result_list);
-	print_map(result_list);
 
 	//print_map_debug(result_list);
 
-	do_the_phase_DOS(result_list, args); //T O D O
+	list * r = do_the_phase_DOS(result_list, args); //T O D O
+	print_map(r);
 }
 
 void do_the_phase_ONE(list *meta_list, list *result_list)
@@ -189,36 +193,101 @@ dontdothis:
 	}
 }
 
-void print_meta_table(list *meta_table)
+bool is_meta_table_empty(list * meta_table)
 {
-	for (int y = 0; y < meta_table->length; y++)
+	if(meta_table->length == 0)
+		return true;
+	for(int i = 0; i < meta_table->length; i++)
 	{
-		list *current = get_at(meta_table, y)->data;
-		for (int x = 0; x < current->length; x++)
+		list * current = get_at(meta_table, i)->data;
+		if(current->length > 0)
+			return false;
+	}
+	return true;
+}
+
+list * do_the_phase_DOS(list *l, char_array2d *minterms)
+{
+	list *meta_table = convert_to_table(l, minterms);
+
+	//Collects essential implicants and transforms table
+	list *result = create_empty_list();
+	while(!is_meta_table_empty(meta_table))
+	{
+		collect_essentials(meta_table, result, l);
+		if(is_meta_table_empty(meta_table))
+			break;
+		remove_submissive_rows(meta_table);
+		remove_dominant_columns(meta_table);
+	}
+	return result;
+}
+
+void remove_dominant_columns(list * meta_table) //(  ͡°  ͜ʖ  ͡° )
+{
+	list * current = get_at(meta_table, 0)->data;
+	for(int x = current->length - 1; x >= 0; x--)
+	{
+		for(int x2 = current->length - 1; x2 >= 0; x2--)
 		{
-			char val = *(char *)get_at(current, x)->data;
-			printf("%d", val);
+			if(x == x2) continue;
+			bool should_be_removed = true;
+			for(int y = meta_table->length - 1; y >= 0; y--)
+			{
+				current = get_at(meta_table, y)->data;
+				char curVal = *(char *)get_at(current, x)->data;
+				char othVal = *(char *)get_at(current, x2)->data;
+				if(curVal == 0 && othVal == 1)
+				{
+					should_be_removed = false;
+				}
+			}
+			if(should_be_removed)
+			{
+				remove_column(meta_table, x);
+				break;
+			}
 		}
-		printf("\n");
 	}
 }
 
-void do_the_phase_DOS(list *l, char_array2d *minterms)
+void remove_submissive_rows(list * meta_table) //( ͡° ͜ʖ ͡°)
 {
-	printf("\n---\n\n");
-	//TODO: IMplement Petrick's MEthod
-	list *meta_table = convert_to_table(l, minterms);
-
-	print_meta_table(meta_table);
-	//Collects essential implicants and transforms table
-	list *result = create_empty_list();
-	collect_essentials(meta_table, result, l);
-	printf("\n---\n\n");
-	print_map(result);
+	for(int i = meta_table->length - 1; i >= 0; i--)
+	{
+		list * current = get_at(meta_table, i)->data;
+		for(int j = meta_table->length - 1; j >= 0; j--)
+		{
+			if(j == i)	continue;
+			list * other = get_at(meta_table, j)->data;
+			bool should_be_removed = true;
+			for(int k = 0; k < current->length; k++)
+			{
+				char curElem = *(char *)get_at(current, k)->data;
+				char othElem = *(char *)get_at(other, k)->data;
+				if(curElem == 1 && othElem == 0)
+					should_be_removed = false;
+			}
+			if(should_be_removed)
+			{
+				//Remove current row.
+				remove_at(meta_table, i);
+				break;
+			}
+		}
+	}
 }
 
+
+//TODO: Are we allowed to change primeimplicnats? Would be better if we could.
 void collect_essentials(list *meta_table, list *result, list *primeimplicants)
 {
+	if(meta_table->length == 1)
+	{
+		list *l = get_at(primeimplicants, 0)->data;
+
+			add_to_end(result, l);
+	}
 	list *conversion = create_empty_list();
 	for (int i = 0; i < primeimplicants->length; i++)
 	{
@@ -260,9 +329,9 @@ void collect_essentials(list *meta_table, list *result, list *primeimplicants)
 			remove_row(meta_table, index_of_last_found);
 			remove_at(conversion, index_of_last_found);
 
-			printf("\n###\n\n");
-
-			print_meta_table(meta_table);
+			if(is_meta_table_empty(meta_table))
+				return;
+			current = get_at(meta_table, 0)->data;
 		}
 	}
 }
