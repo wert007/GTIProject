@@ -40,16 +40,25 @@ void remove_at(list *l, unsigned int i);
 void remove_duplicates(list *l);
 void remove_duplicates_meta(list *l);
 
+char_array2d *create_empty_char_array2d(unsigned int width, unsigned int height);
+
 unsigned int count_ones(char_array component);
 void compare(unsigned int ones, list *current, list *next, list *, list *, list *new_meta_list);
 bool is_off_by_one_bit(char_array *currentComponent, char_array *nextComponent);
 char_array *combine_components(char_array *currentComponent, char_array *nextComponent);
 
+bool a_can_be_converted_to_b(char_array *a, char_array *b);
+void remove_column(list *meta_table, int index);
+void remove_row(list *meta_table, int index);
+
+void collect_essentials(list *meta_table, list *result, list *primeimplicants);
+
+list *convert_to_table(list *primeimplicants, char_array2d *minterms);
 void add_to_meta_list_at(unsigned int index, list *base, char_array *data);
 
 void foo(char_array2d *args);
 void do_the_phase_ONE(list *meta_list, list *);
-void do_the_phase_DOS(list * l);
+void do_the_phase_DOS(list *l, char_array2d *minterms);
 void parse_args(int argc, char **argv, char_array2d **values);
 
 void print_char_array(char_array *arr);
@@ -113,7 +122,7 @@ void foo(char_array2d *args)
 
 	//print_map_debug(result_list);
 
-	do_the_phase_DOS(result_list); //T O D O
+	do_the_phase_DOS(result_list, args); //T O D O
 }
 
 void do_the_phase_ONE(list *meta_list, list *result_list)
@@ -134,7 +143,7 @@ void do_the_phase_ONE(list *meta_list, list *result_list)
 	list *new_meta_list = create_empty_list();
 
 	//Main Loop, compares the elemts with each other
-	for (int i = 0; i < meta_list->length -1; i++)
+	for (int i = 0; i < meta_list->length - 1; i++)
 	{
 		list *current = get_at(meta_list, i)->data;
 		list *next = get_at(meta_list, i + 1)->data;
@@ -145,7 +154,6 @@ void do_the_phase_ONE(list *meta_list, list *result_list)
 	list *current = get_at(meta_list, (meta_list->length - 1))->data;
 	compare(meta_list->length, current, create_empty_list(), result_list, meta_list, new_meta_list);
 	//remove_duplicates_meta(new_meta_list);
-
 
 	//Loop to check, if at least one element has been compared
 	for (int i = 0; i < meta_list->length; i++)
@@ -166,12 +174,13 @@ dontdothis:
 	if (success)
 	{
 		do_the_phase_ONE(new_meta_list, result_list);
-	}else
+	}
+	else
 	{
-		for(int i = 0; i < new_meta_list->length; i++)
+		for (int i = 0; i < new_meta_list->length; i++)
 		{
-			list* current = get_at(new_meta_list, i)->data;
-			for(int j = 0; j < current->length; j++)
+			list *current = get_at(new_meta_list, i)->data;
+			for (int j = 0; j < current->length; j++)
 			{
 				add_to_end(result_list, get_at(current, j)->data);
 			}
@@ -180,13 +189,141 @@ dontdothis:
 	}
 }
 
-void do_the_phase_DOS(list * l)
+void print_meta_table(list *meta_table)
 {
+	for (int y = 0; y < meta_table->length; y++)
+	{
+		list *current = get_at(meta_table, y)->data;
+		for (int x = 0; x < current->length; x++)
+		{
+			char val = *(char *)get_at(current, x)->data;
+			printf("%d", val);
+		}
+		printf("\n");
+	}
+}
+
+void do_the_phase_DOS(list *l, char_array2d *minterms)
+{
+	printf("\n---\n\n");
 	//TODO: IMplement Petrick's MEthod
-	char_array2d *table = convert_to_table(l);
+	list *meta_table = convert_to_table(l, minterms);
+
+	print_meta_table(meta_table);
 	//Collects essential implicants and transforms table
-	list * essentials = collect_essentials(table);
- 
+	list *result = create_empty_list();
+	collect_essentials(meta_table, result, l);
+	printf("\n---\n\n");
+	print_map(result);
+}
+
+void collect_essentials(list *meta_table, list *result, list *primeimplicants)
+{
+	list *conversion = create_empty_list();
+	for (int i = 0; i < primeimplicants->length; i++)
+	{
+		int *copy = malloc(sizeof(int));
+		copy[0] = i;
+		add_to_end(conversion, copy);
+	}
+	list *current = get_at(meta_table, 0)->data;
+	for (int x = current->length - 1; x >= 0; x--)
+	{
+		int ones_in_row = 0;
+		int index_of_last_found = -1;
+		for (int y = 0; y < meta_table->length; y++)
+		{
+			current = get_at(meta_table, y)->data;
+			char val = *(char *)(get_at(current, x)->data);
+			if (val == 1)
+			{
+
+				ones_in_row++;
+				index_of_last_found = y;
+			}
+		}
+		if (ones_in_row == 1)
+		{
+			int primIndex = *(int *)get_at(conversion, index_of_last_found)->data;
+			list *l = get_at(primeimplicants, primIndex)->data;
+
+			add_to_end(result, l);
+			list *row = get_at(meta_table, index_of_last_found)->data;
+			printf("row = \n");
+			for (int i = row->length - 1; i >= 0; i--)
+			{
+				char value = *(char *)get_at(row, i)->data;
+				printf("%d", value);
+				if (value == 1)
+				{
+					remove_column(meta_table, i);
+				}
+			}
+			printf("\n");
+			remove_row(meta_table, index_of_last_found);
+			remove_at(conversion, index_of_last_found);
+
+			printf("\n###\n\n");
+
+			print_meta_table(meta_table);
+		}
+	}
+}
+
+void remove_row(list *meta_table, int index)
+{
+	remove_at(meta_table, index);
+}
+
+void remove_column(list *meta_table, int index)
+{
+	for (int i = 0; i < meta_table->length; i++)
+	{
+		list *current = get_at(meta_table, i)->data;
+		remove_at(current, index);
+	}
+}
+
+list *convert_to_table(list *primeimplicants, char_array2d *minterms)
+{
+	list *result = create_empty_list();
+	//char_array2d * result = create_empty_char_array2d(minterms->length, primeimplicants->length);
+	for (int y = 0; y < primeimplicants->length; y++)
+	{
+		list *current = create_empty_list();
+		add_to_end(result, current);
+		for (int x = 0; x < minterms->length; x++)
+		{
+			char_array *b = get_at(primeimplicants, y)->data;
+			char_array *a = minterms->data[x];
+
+			char *value = malloc(sizeof(char));
+			value[0] = a_can_be_converted_to_b(a, b);
+			add_to_end(current, value);
+		}
+	}
+	return result;
+}
+
+bool a_can_be_converted_to_b(char_array *a, char_array *b)
+{
+	if (a->length != b->length)
+		return false;
+	for (int i = 0; i < a->length; i++)
+	{
+		switch (a->data[i])
+		{
+		case 0:
+			if (b->data[i] == 1)
+				return false;
+			break;
+		case 1:
+			if (b->data[i] == 0)
+				return false;
+			break;
+		}
+	}
+	return true;
 }
 
 void compare(unsigned int ones, list *current, list *next, list *result_list, list *meta_list, list *new_meta_list)
@@ -198,7 +335,6 @@ void compare(unsigned int ones, list *current, list *next, list *result_list, li
 		for (int j = 0; j < next->length; j++)
 		{
 			char_array *next_component = get_at(next, j)->data;
-			
 
 			//if there is only one digit differnt
 			if (is_off_by_one_bit(current_component, next_component))
@@ -206,7 +342,7 @@ void compare(unsigned int ones, list *current, list *next, list *result_list, li
 				current_component->has_been_compared = true;
 				next_component->has_been_compared = true;
 				char_array *component = combine_components(current_component, next_component);
-			
+
 				//add the combined elemnts to new list
 				int newIndex = count_ones(*component);
 				add_to_meta_list_at(newIndex, new_meta_list, component);
@@ -238,11 +374,11 @@ bool is_off_by_one_bit(char_array *current_component, char_array *next_component
 	int count = 0;
 	for (int i = 0; i < current_component->length; i++)
 	{
-		if((current_component->data[i] == 2) && (next_component->data[i] != 2))
-			{
+		if ((current_component->data[i] == 2) && (next_component->data[i] != 2))
+		{
 			count = 5;
 			break;
-			}
+		}
 		else if (current_component->data[i] == next_component->data[i])
 			continue;
 		else
@@ -254,13 +390,13 @@ bool is_off_by_one_bit(char_array *current_component, char_array *next_component
 		return false;
 }
 
-bool equals(char_array * a, char_array * b)
+bool equals(char_array *a, char_array *b)
 {
-	if(a->length != b->length)
+	if (a->length != b->length)
 		return false;
-	for(int i = 0; i < a->length; i++)
+	for (int i = 0; i < a->length; i++)
 	{
-		if(a->data[i] != b->data[i])
+		if (a->data[i] != b->data[i])
 			return false;
 	}
 	return true;
@@ -272,6 +408,18 @@ char_array *create_empty_char_array(unsigned int length)
 	result->length = length;
 	result->has_been_compared = false;
 	result->data = malloc(length * sizeof(char));
+	return result;
+}
+
+char_array2d *create_empty_char_array2d(unsigned int width, unsigned int height)
+{
+	char_array2d *result = malloc(sizeof(char_array2d));
+	result->length = height;
+	result->data = malloc(sizeof(char_array *) * height);
+	for (int i = 0; i < height; i++)
+	{
+		result->data[i] = create_empty_char_array(width);
+	}
 	return result;
 }
 
@@ -388,9 +536,9 @@ void add_to_end(list *l, void *data)
 	l->length = l->length + 1;
 }
 
-node * remove_at_node(node * n, unsigned int i)
+node *remove_at_node(node *n, unsigned int i)
 {
-	if(i == 0)
+	if (i == 0)
 	{
 		return n->next;
 	}
@@ -401,25 +549,25 @@ node * remove_at_node(node * n, unsigned int i)
 	}
 }
 
-void remove_at(list * l, unsigned int i)
+void remove_at(list *l, unsigned int i)
 {
 	l->root = remove_at_node(l->root, i);
 	//Could go horrible wrong if we actually didn't delete anything.
-	if(l->length - 1 < 0)
+	if (l->length - 1 < 0)
 		l->length = 0;
 	else
 		l->length = l->length - 1;
 }
 
-void remove_duplicates(list * l)
+void remove_duplicates(list *l)
 {
-	for(int i = l->length - 2; i >= 0; i--)
+	for (int i = l->length - 2; i >= 0; i--)
 	{
 		char_array *current = get_at(l, i)->data;
-		for(int j = l->length - 1; j > i; j--)
+		for (int j = l->length - 1; j > i; j--)
 		{
 			char_array *other = get_at(l, j)->data;
-			if(equals(current, other) && i != j)
+			if (equals(current, other) && i != j)
 				remove_at(l, i);
 		}
 	}
@@ -427,12 +575,11 @@ void remove_duplicates(list * l)
 
 void remove_duplicates_meta(list *l)
 {
-	for(int i = 0; i < l->length; i++)
+	for (int i = 0; i < l->length; i++)
 	{
-		list * current = get_at(l, i)->data;
+		list *current = get_at(l, i)->data;
 		remove_duplicates(current);
 	}
-
 }
 
 void print_map(list *results)
@@ -449,13 +596,15 @@ void print_map(list *results)
 				printf("%c", j + 'A');
 			else if (v == 0)
 				printf("%c", j + 'a');
-			else count += 1;
+			else
+				count += 1;
 		}
-		if(count != current_arr->length)
+		if (count != current_arr->length)
 			printf("\n");
-		else dont_care = 1;
+		else
+			dont_care = 1;
 	}
-	if(dont_care != 0)
+	if (dont_care != 0)
 		printf("it doesnt matter, always on :D\n");
 }
 
