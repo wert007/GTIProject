@@ -249,17 +249,14 @@ void collect_essentials(list *meta_table, list *result, list *primeimplicants)
 
 			add_to_end(result, l);
 			list *row = get_at(meta_table, index_of_last_found)->data;
-			printf("row = \n");
 			for (int i = row->length - 1; i >= 0; i--)
 			{
 				char value = *(char *)get_at(row, i)->data;
-				printf("%d", value);
 				if (value == 1)
 				{
 					remove_column(meta_table, i);
 				}
 			}
-			printf("\n");
 			remove_row(meta_table, index_of_last_found);
 			remove_at(conversion, index_of_last_found);
 
