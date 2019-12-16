@@ -53,6 +53,7 @@ void remove_submissive_rows(list * meta_table); //( ͡° ͜ʖ ͡°)
 void remove_dominant_columns(list * meta_table); //( ͡° ͜ʖ ͡°)
 
 bool is_meta_table_empty(list * meta_table);
+void do_something_random_xD(list * meta_table, list * result, list * primeimplicants);
 
 void collect_essentials(list *meta_table, list *result, list *primeimplicants);
 

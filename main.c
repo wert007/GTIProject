@@ -138,21 +138,52 @@ bool is_meta_table_empty(list * meta_table)
 	return true;
 }
 
+void print_meta_table(list *meta_table)
+{
+	for (int y = 0; y < meta_table->length; y++)
+	{
+		list *current = get_at(meta_table, y);
+		for (int x = 0; x < current->length; x++)
+		{
+			char val = *(char *)get_at(current, x);
+			printf("%d", val);
+		}
+		printf("\n");
+	}
+}
+
 list * do_the_phase_DOS(list *l, char_array2d *minterms)
 {
 	list *meta_table = convert_to_table(l, minterms);
 
 	//Collects essential implicants and transforms table
 	list *result = create_empty_list();
+	int meta_table_length = -1;
 	while(!is_meta_table_empty(meta_table))
 	{
+		meta_table_length = meta_table->length;
 		collect_essentials(meta_table, result, l);
+		print_meta_table(meta_table);
+			printf("\n###\n\n");
 		if(is_meta_table_empty(meta_table))
 			break;
 		remove_submissive_rows(meta_table);
 		remove_dominant_columns(meta_table);
+		if(meta_table_length == meta_table->length)
+		{
+			do_something_random_xD(meta_table, result, l);
+			print_meta_table(meta_table);
+			printf("\n###\n\n");
+		}
 	}
 	return result;
+}
+
+void do_something_random_xD(list * meta_table, list * result, list * primeimplicants)
+{
+	list *l = get_at(primeimplicants, 0);
+	add_to_end(result, l);
+	remove_at(meta_table, 0);
 }
 
 void remove_dominant_columns(list * meta_table) //(  ͡°  ͜ʖ  ͡° )
@@ -217,17 +248,18 @@ void collect_essentials(list *meta_table, list *result, list *primeimplicants)
 	if(meta_table->length == 1)
 	{
 		list *l = get_at(primeimplicants, 0);
+		remove_at(primeimplicants, 0);
 		add_to_end(result, l);
 		remove_at(meta_table, 0);
 		return;
 	}
-	list *conversion = create_empty_list();
-	for (int i = 0; i < primeimplicants->length; i++)
-	{
-		int *copy = malloc(sizeof(int));
-		copy[0] = i;
-		add_to_end(conversion, copy);
-	}
+	// list *conversion = create_empty_list();
+	// for (int i = 0; i < primeimplicants->length; i++)
+	// {
+	// 	int *copy = malloc(sizeof(int));
+	// 	copy[0] = i;
+	// 	add_to_end(conversion, copy);
+	// }
 	list *current = get_at(meta_table, 0);
 	for (int x = current->length - 1; x >= 0; x--)
 	{
@@ -246,9 +278,8 @@ void collect_essentials(list *meta_table, list *result, list *primeimplicants)
 		}
 		if (ones_in_row == 1)
 		{
-			int primIndex = *(int *)get_at(conversion, index_of_last_found);
-			list *l = get_at(primeimplicants, primIndex);
-
+			list *l = get_at(primeimplicants, index_of_last_found);
+			remove_at(primeimplicants, index_of_last_found);
 			add_to_end(result, l);
 			list *row = get_at(meta_table, index_of_last_found);
 			for (int i = row->length - 1; i >= 0; i--)
@@ -260,7 +291,6 @@ void collect_essentials(list *meta_table, list *result, list *primeimplicants)
 				}
 			}
 			remove_row(meta_table, index_of_last_found);
-			remove_at(conversion, index_of_last_found);
 
 			if(is_meta_table_empty(meta_table))
 				return;
