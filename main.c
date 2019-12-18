@@ -231,9 +231,7 @@ void remove_dominant_columns(list *meta_table) //(  ͡°  ͜ʖ  ͡° )
 				char curVal = *(char *)get_at(current, x);
 				char othVal = *(char *)get_at(current, x2);
 				if (curVal == 0 && othVal == 1)
-				{
 					should_be_removed = false;
-				}
 			}
 			if (should_be_removed)
 			{
@@ -242,6 +240,7 @@ void remove_dominant_columns(list *meta_table) //(  ͡°  ͜ʖ  ͡° )
 			}
 		}
 	}
+	//Removes "0"-rows
 	for(int i = meta_table->length - 1; i >= 0; i--)
 	{
 		list * cur = get_at(meta_table, i);
@@ -253,9 +252,7 @@ void remove_dominant_columns(list *meta_table) //(  ͡°  ͜ʖ  ͡° )
 				found_one = true;
 		}
 		if(!found_one)
-		{
 			remove_at(meta_table, i);
-		}
 	}
 }
 
