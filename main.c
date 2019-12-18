@@ -183,8 +183,6 @@ void remove_unimportant_rows_and_columns(list * meta_table)
 
 void do_something_random_xD(list *meta_table, list *result, list *primeimplicants)
 {
-	//TODO: Remove the one primeimplicant, which
-	//has the most ones.
 	int index = 0;
 	int max_ones = -1;
 	for(int i = 0; i < primeimplicants->length; i++)
