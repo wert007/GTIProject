@@ -42,7 +42,7 @@ void remove_duplicates_meta(list *l);
 char_array2d *create_empty_char_array2d(unsigned int width, unsigned int height);
 
 unsigned int count_ones(char_array component);
-void compare(unsigned int ones, list *current, list *next, list *, list *, list *new_meta_list);
+void compare(list *current, list *next, list *meta_list, list *new_meta_list);
 bool is_off_by_one_bit(char_array *currentComponent, char_array *nextComponent);
 char_array *combine_components(char_array *currentComponent, char_array *nextComponent);
 

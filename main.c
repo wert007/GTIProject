@@ -81,12 +81,12 @@ void do_the_phase_ONE(list *meta_list, list *result_list)
 	{
 		list *current = get_at(meta_list, i);
 		list *next = get_at(meta_list, i + 1);
-		compare(i, current, next, result_list, meta_list, new_meta_list);
+		compare(current, next, meta_list, new_meta_list);
 		//remove_duplicates_meta(new_meta_list);
 	}
 	//checks for last element if it was compared
 	list *current = get_at(meta_list, (meta_list->length - 1));
-	compare(meta_list->length, current, create_empty_list(), result_list, meta_list, new_meta_list);
+	compare(current, create_empty_list(), meta_list, new_meta_list);
 	//remove_duplicates_meta(new_meta_list);
 
 	//Loop to check, if at least one element has been compared
@@ -380,9 +380,7 @@ bool a_can_be_converted_to_b(char_array *a, char_array *b)
 	return true;
 }
 
-//We don't use this????									   |
-//														   v
-void compare(unsigned int ones, list *current, list *next, list *result_list, list *meta_list, list *new_meta_list)
+void compare(list *current, list *next, list *meta_list, list *new_meta_list)
 {
 	//Main Loop to compare elements
 	for (int i = 0; i < current->length; i++)
