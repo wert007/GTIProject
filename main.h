@@ -36,6 +36,7 @@ void free_list(list *l);
 void free_meta_list(list *meta_list);
 void add_to_end(list *l, void *data);
 void remove_at(list *l, unsigned int i);
+void * pop(list * l, unsigned int i);
 void remove_duplicates(list *l);
 void remove_duplicates_meta(list *l);
 

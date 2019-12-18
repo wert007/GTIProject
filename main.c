@@ -197,17 +197,22 @@ void do_something_random_xD(list *meta_table, list *result, list *primeimplicant
 			index = i;
 		}
 	}
-	char_array *l = get_at(primeimplicants, index);
-	remove_at(primeimplicants, index);
+	char_array *l = pop(primeimplicants, index);
 	add_to_end(result, l);
-	list * cur = get_at(meta_table, index);
-	remove_at(meta_table, index);
+	list * cur = pop(meta_table, index);
 	for (int i = cur->length - 1; i >= 0; i--)
 	{
 		char val = *(char*)get_at(cur, i);
 		if (val != 0)
 			remove_column(meta_table, i);
 	}
+}
+
+void * pop(list * l, unsigned int i)
+{
+	void * result = get_at(l, i);
+	remove_at(l, i);
+	return result;
 }
 
 void remove_dominant_columns(list *meta_table) //(  ͡°  ͜ʖ  ͡° )
