@@ -105,7 +105,7 @@ void do_the_phase_ONE(list *meta_list, list *result_list)
 
 void wrap_it_up(bool is_done, list * new_meta_list, list * result_list)
 {
-	if(is_done)
+	if(is_done)	//We didn't compare anything with eachother, so we can stop now
 	{
 		for (int i = 0; i < new_meta_list->length; i++)
 		{
@@ -113,11 +113,11 @@ void wrap_it_up(bool is_done, list * new_meta_list, list * result_list)
 			for (int j = 0; j < current->length; j++)
 				add_to_end(result_list, get_at(current, j));
 		}
+		//Removing possible duplicates, so we have a cleaner list to work on
 		remove_duplicates(result_list);
 	}
 	else
 		do_the_phase_ONE(new_meta_list, result_list);
-	
 }
 
 bool is_meta_table_empty(list *meta_table)
