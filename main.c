@@ -73,7 +73,6 @@ void do_the_phase_ONE(list *meta_list, list *result_list)
 			currentComp->has_been_compared = false;
 		}
 	}
-	bool success = false;
 	list *new_meta_list = create_empty_list();
 
 	//Main Loop, compares the elemts with each other
@@ -96,13 +95,16 @@ void do_the_phase_ONE(list *meta_list, list *result_list)
 			char_array *comp_arr = get_at(comp_list, j);
 			if (comp_arr->has_been_compared)
 			{
-				success = true;
-				goto dontdothis;
+				wrap_it_up(true, new_meta_list, result_list);
+				return;
 			}
 		}
 	}
-dontdothis:
-	//if so, run it again
+	wrap_it_up(false, new_meta_list, result_list);
+}
+
+void wrap_it_up(bool success, list * new_meta_list, list * result_list)
+{
 	if (success)
 	{
 		do_the_phase_ONE(new_meta_list, result_list);
