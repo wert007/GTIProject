@@ -57,6 +57,10 @@ void foo(char_array2d *args)
 
 	list *r = do_the_phase_DOS(result_list, args);
 	print_map(r);
+	//TODO:
+	//free_meta_list(meta_list);
+	//free_list(result_list);
+	//free_list(r);
 }
 
 void do_the_phase_ONE(list *meta_list, list *result_list)
@@ -108,6 +112,7 @@ void wrap_it_up(bool is_done, list * new_meta_list, list * result_list)
 {
 	if(is_done)	//We didn't compare anything with eachother, so we can stop now
 	{
+		//Loop to collect result and add them to result_list
 		for (int i = 0; i < new_meta_list->length; i++)
 		{
 			list *current = get_at(new_meta_list, i);
@@ -123,17 +128,21 @@ void wrap_it_up(bool is_done, list * new_meta_list, list * result_list)
 
 bool is_meta_table_empty(list *meta_table)
 {
+	//We don't have any elements
 	if (meta_table->length == 0)
 		return true;
+	//We have elements, but do they have elements?
 	for (int i = 0; i < meta_table->length; i++)
 	{
 		list *current = get_at(meta_table, i);
 		if (current->length > 0)
-			return false;
+			return false; //They do.
 	}
+	//They don't.
 	return true;
 }
 
+//TODO: Debug
 void print_meta_table(list *meta_table)
 {
 	for (int y = 0; y < meta_table->length; y++)
@@ -148,9 +157,10 @@ void print_meta_table(list *meta_table)
 	}
 }
 
-list *do_the_phase_DOS(list *l, char_array2d *minterms)
+list *do_the_phase_DOS(list *primimplicants, char_array2d *minterms)
 {
-	list *meta_table = convert_to_table(l, minterms);
+	//Convert our primimplicants and the minterms into one table
+	list *meta_table = convert_to_table(primimplicants, minterms);
 
 	list *result = create_empty_list();
 	int meta_table_length = -1;
@@ -158,13 +168,13 @@ list *do_the_phase_DOS(list *l, char_array2d *minterms)
 	{
 		meta_table_length = meta_table->length;
 		//Collect essential implicants and transform table
-		collect_essentials(meta_table, result, l);
+		collect_essentials(meta_table, result, primimplicants);
 		remove_unimportant_rows_and_columns(meta_table);
 		//If we didn't find any essential primimplicants
 		//Remove just any element.
 		if (meta_table_length == meta_table->length)
 		{
-			do_something_random_xD(meta_table, result, l);
+			choose_any_primimplicant(meta_table, result, primimplicants);
 			remove_unimportant_rows_and_columns(meta_table);
 		}
 	}
@@ -181,13 +191,14 @@ void remove_unimportant_rows_and_columns(list * meta_table)
 	remove_dominant_columns(meta_table);
 }
 
-void do_something_random_xD(list *meta_table, list *result, list *primeimplicants)
+void choose_any_primimplicant(list *meta_table, list *result, list *primimplicants)
 {
+	//Choose the primimplicant, which covers the most values
 	int index = 0;
 	int max_ones = -1;
-	for(int i = 0; i < primeimplicants->length; i++)
+	for(int i = 0; i < primimplicants->length; i++)
 	{
-		char_array * cur = get_at(primeimplicants, i);
+		char_array * cur = get_at(primimplicants, i);
 		int ones = count_ones(*cur);
 		if(ones > max_ones)
 		{
@@ -195,7 +206,8 @@ void do_something_random_xD(list *meta_table, list *result, list *primeimplicant
 			index = i;
 		}
 	}
-	char_array *l = pop(primeimplicants, index);
+	//Remove that primimplicant from the meta_table
+	char_array *l = pop(primimplicants, index);
 	add_to_end(result, l);
 	list * cur = pop(meta_table, index);
 	for (int i = cur->length - 1; i >= 0; i--)
@@ -206,16 +218,10 @@ void do_something_random_xD(list *meta_table, list *result, list *primeimplicant
 	}
 }
 
-void * pop(list * l, unsigned int i)
-{
-	void * result = get_at(l, i);
-	remove_at(l, i);
-	return result;
-}
-
 void remove_dominant_columns(list *meta_table) //(  ͡°  ͜ʖ  ͡° )
 {
 	list *current = get_at(meta_table, 0);
+	//Loop to compare all columns with all other columns
 	for (int x = current->length - 1; x >= 0; x--)
 	{
 		for (int x2 = current->length - 1; x2 >= 0; x2--)
@@ -274,17 +280,16 @@ void remove_submissive_rows(list *meta_table) //( ͡° ͜ʖ ͡°)
 			}
 			if (should_be_removed)
 			{
-				//Remove current row.
 				remove_at(meta_table, i);
-				break;
+				break; //TODO: Could that be our error?
 			}
 		}
 	}
 }
 
-//TODO: Are we allowed to change primeimplicnats? Would be better if we could.
 void collect_essentials(list *meta_table, list *result, list *primeimplicants)
 {
+	//We have only one element. Of course it is essential!
 	if (meta_table->length == 1)
 	{
 		list *l = get_at(primeimplicants, 0);
@@ -293,6 +298,8 @@ void collect_essentials(list *meta_table, list *result, list *primeimplicants)
 		remove_at(meta_table, 0);
 		return;
 	}
+	//Else. Check all rows with each other to see
+	//If there is only one "1" in it. aka it's essential!
 	list *current = get_at(meta_table, 0);
 	for (int x = current->length - 1; x >= 0; x--)
 	{
@@ -311,7 +318,7 @@ void collect_essentials(list *meta_table, list *result, list *primeimplicants)
 				index_of_last_found = y;
 			}
 		}
-
+		//Lucky day! Only one "1" in this row
 		if (ones_in_row == 1)
 		{
 			list *l = get_at(primeimplicants, index_of_last_found);
@@ -322,9 +329,7 @@ void collect_essentials(list *meta_table, list *result, list *primeimplicants)
 			{
 				char value = *(char *)get_at(row, i);
 				if (value == 1)
-				{
 					remove_column(meta_table, i);
-				}
 			}
 			remove_row(meta_table, index_of_last_found);
 
@@ -333,11 +338,6 @@ void collect_essentials(list *meta_table, list *result, list *primeimplicants)
 			current = get_at(meta_table, 0);
 		}
 	}
-}
-
-void remove_row(list *meta_table, int index)
-{
-	remove_at(meta_table, index);
 }
 
 void remove_column(list *meta_table, int index)
@@ -362,14 +362,14 @@ list *convert_to_table(list *primeimplicants, char_array2d *minterms)
 			char_array *a = minterms->data[x];
 
 			char *value = malloc(sizeof(char));
-			value[0] = a_can_be_converted_to_b(a, b);
+			value[0] = a_covers_b(a, b);
 			add_to_end(current, value);
 		}
 	}
 	return result;
 }
 
-bool a_can_be_converted_to_b(char_array *a, char_array *b)
+bool a_covers_b(char_array *a, char_array *b)
 {
 	if (a->length != b->length)
 		return false;
@@ -437,19 +437,13 @@ bool is_off_by_one_bit(char_array *current_component, char_array *next_component
 	for (int i = 0; i < current_component->length; i++)
 	{
 		if ((current_component->data[i] == 2) && (next_component->data[i] != 2))
-		{
-			count = 5;
-			break;
-		}
+			return false;
 		else if (current_component->data[i] == next_component->data[i])
 			continue;
 		else
 			count += 1;
 	}
-	if (count == 1)
-		return true;
-	else
-		return false;
+	return count == 1;
 }
 
 bool equals(char_array *a, char_array *b)
@@ -602,15 +596,13 @@ void add_to_end(list *l, void *data)
 
 node *remove_at_node(node *n, unsigned int i)
 {
-	if (i == 0)
-	{
-		return n->next;
-	}
-	else
+	if (i != 0)
 	{
 		n->next = remove_at_node(n->next, i - 1);
 		return n;
 	}
+	else
+		return n->next;
 }
 
 void remove_at(list *l, unsigned int i)
@@ -623,6 +615,13 @@ void remove_at(list *l, unsigned int i)
 		l->length = l->length - 1;
 }
 
+void * pop(list * l, unsigned int i)
+{
+	void * result = get_at(l, i);
+	remove_at(l, i);
+	return result;
+}
+
 void remove_duplicates(list *l)
 {
 	for (int i = l->length - 2; i >= 0; i--)
@@ -631,17 +630,15 @@ void remove_duplicates(list *l)
 		for (int j = l->length - 1; j > i; j--)
 		{
 			char_array *other = get_at(l, j);
-			if (equals(current, other) && i != j){
+			if (equals(current, other) && i != j)
 				remove_at(l, j);
-			}
-
 		}
 	}
 }
 
 void print_map(list *results)
 {
-	int dont_care = 0;
+	bool is_only_dont_care = false;
 	for (int i = 0; i < results->length; i++)
 	{
 		char_array *current_arr = get_at(results, i);
@@ -659,8 +656,8 @@ void print_map(list *results)
 		if (count != current_arr->length)
 			printf("\n");
 		else
-			dont_care = 1;
+			is_only_dont_care = true;
 	}
-	if (dont_care != 0)
+	if (is_only_dont_care)
 		printf("Don't care situation: Always on!\n");
 }
