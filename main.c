@@ -15,11 +15,51 @@ void parse_args(int argc, char **argv, char_array2d **values)
 	*values = malloc(sizeof(char_array2d));
 	(*values)->length = length;
 	(*values)->data = malloc(length * sizeof(char_array *));
+	unsigned int minterm_length = 0;
+	for(int i = 0; i < length; i++)
+	{
+		char * cur_argv = argv[i + 1];
+		for(int j = 0; cur_argv[j]; j++)
+		{
+			int val = tolower(cur_argv[j]) - 'a' + 1;
+			if(val > minterm_length)
+				minterm_length = val;
+		}
+	}
+	for(int i = 0; i < length; i++)
+	{
+		char_array *cur = malloc(sizeof(char_array));
+		cur->length = minterm_length;
+		cur->has_been_compared = false;
+		cur->data = malloc(minterm_length * sizeof(char));
+		for(int j = 0; j < minterm_length; j++)
+			cur->data[j] = 2;
+		for(int j = 0; argv[i + 1][j]; j++)
+		{
+			char c = argv[i + 1][j];
+			int index = tolower(c) - 'a';
+			if(c >= 'A' && c <= 'Z')
+				cur->data[index] = 1;
+			else if(c >= 'a' && c <= 'z')
+				cur->data[index] = 0;
+
+		}
+		(*values)->data[i] = cur;
+	}
+}
+
+void _parse_args(int argc, char **argv, char_array2d **values)
+{
+	int length = argc - 1;
+	*values = malloc(sizeof(char_array2d));
+	(*values)->length = length;
+	(*values)->data = malloc(length * sizeof(char_array *));
 	for (int i = 0; i < length; i++)
 	{
 		char_array *cur = malloc(sizeof(char_array));
 		cur->length = strlen(argv[i + 1]);
 		cur->has_been_compared = false;
+		//HOW DOES THIS EVEN WORK?? THAT'S A COMPLETELY DIFFERENT LENGTH?!
 		cur->data = calloc(length, sizeof(char));
 		for (int c = 0; c < cur->length; c++)
 		{
