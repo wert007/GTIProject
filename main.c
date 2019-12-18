@@ -391,8 +391,6 @@ void compare(list *current, list *next, list *meta_list, list *new_meta_list)
 			//if there is only one digit differnt
 			if (is_off_by_one_bit(current_component, next_component))
 			{
-				current_component->has_been_compared = true;
-				next_component->has_been_compared = true;
 				char_array *component = combine_components(current_component, next_component);
 
 				//add the combined elemnts to new list
@@ -475,15 +473,17 @@ char_array2d *create_empty_char_array2d(unsigned int width, unsigned int height)
 	return result;
 }
 
-char_array *combine_components(char_array *currentComponent, char_array *nextComponent)
+char_array *combine_components(char_array *current_component, char_array *next_component)
 {
-	char_array *to_be_added = create_empty_char_array(currentComponent->length);
-	for (int i = 0; i < currentComponent->length; i++)
+	current_component->has_been_compared = true;
+	next_component->has_been_compared = true;
+	char_array *to_be_added = create_empty_char_array(current_component->length);
+	for (int i = 0; i < current_component->length; i++)
 	{
-		if (currentComponent->data[i] != nextComponent->data[i])
+		if (current_component->data[i] != next_component->data[i])
 			to_be_added->data[i] = 2;
 		else
-			to_be_added->data[i] = currentComponent->data[i];
+			to_be_added->data[i] = current_component->data[i];
 	}
 	return to_be_added;
 }
