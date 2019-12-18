@@ -46,12 +46,12 @@ void parse_args(int argc, char **argv, char_array2d **values)
 
 void foo(char_array2d *args)
 {
-	list *meta_list = create_empty_list(); // malloc(sizeof(list));
+	list *meta_list = create_empty_list();
 	list *result_list = create_empty_list();
 	for (int i = 0; i < args->length; i++)
 	{
 		int ones = count_ones(*args->data[i]);
-		add_to_meta_list_at(ones, meta_list, args->data[i]); //TODO wert007
+		add_to_meta_list_at(ones, meta_list, args->data[i]);
 	}
 	do_the_phase_ONE(meta_list, result_list);
 
@@ -61,6 +61,7 @@ void foo(char_array2d *args)
 
 void do_the_phase_ONE(list *meta_list, list *result_list)
 {
+	//TODO: Is this if ever true?
 	if (meta_list->length == 0)
 		return;
 	//Reset Loop
@@ -151,33 +152,29 @@ list *do_the_phase_DOS(list *l, char_array2d *minterms)
 {
 	list *meta_table = convert_to_table(l, minterms);
 
-	//Collects essential implicants and transforms table
 	list *result = create_empty_list();
 	int meta_table_length = -1;
 	while (!is_meta_table_empty(meta_table))
 	{
 		meta_table_length = meta_table->length;
+		//Collect essential implicants and transform table
 		collect_essentials(meta_table, result, l);
-		if (is_meta_table_empty(meta_table))
-			break;
-		remove_submissive_rows(meta_table);
-		if (is_meta_table_empty(meta_table))
-			break;
-		remove_dominant_columns(meta_table);
-		if (is_meta_table_empty(meta_table))
-			break;
+		remove_unimportant_rows_and_columns(meta_table);
+		//If we didn't find any essential primimplicants
+		//Remove just any element.
 		if (meta_table_length == meta_table->length)
 		{
 			do_something_random_xD(meta_table, result, l);
-			remove_submissive_rows(meta_table);
-			if (is_meta_table_empty(meta_table))
-				break;
-			remove_dominant_columns(meta_table);
-			if (is_meta_table_empty(meta_table))
-				break;
+			remove_unimportant_rows_and_columns(meta_table);
 		}
 	}
 	return result;
+}
+
+void remove_unimportant_rows_and_columns(list * meta_table)
+{
+	remove_submissive_rows(meta_table);
+	remove_dominant_columns(meta_table);
 }
 
 void do_something_random_xD(list *meta_table, list *result, list *primeimplicants)
