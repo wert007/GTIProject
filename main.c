@@ -155,7 +155,6 @@ void print_meta_table(list *meta_table)
 list * do_the_phase_DOS(list *l, char_array2d *minterms)
 {
 	list *meta_table = convert_to_table(l, minterms);
-	printf("1\n");
 
 	//Collects essential implicants and transforms table
 	list *result = create_empty_list();
@@ -163,27 +162,14 @@ list * do_the_phase_DOS(list *l, char_array2d *minterms)
 	while(!is_meta_table_empty(meta_table))
 	{
 		meta_table_length = meta_table->length;
-		printf("meta_table_length is %i\n",meta_table_length);
-		printf("meta_table->length -1 is %i\n",meta_table->length);
 		collect_essentials(meta_table, result, l);
-		printf("meta_table->length is %i\n",meta_table->length);
-		//print_meta_table(meta_table);
-			//printf("\n###\n\n");
 		if(is_meta_table_empty(meta_table))
 			break;
 		remove_submissive_rows(meta_table);
-		printf("meta_table->length 2 is %i\n",meta_table->length);
-
 		remove_dominant_columns(meta_table);
-		printf("meta_table->length 3 is %i\n",meta_table->length);
 		if(meta_table_length == meta_table->length)
 		{
-		printf("meta_table->length 4 is %i\n",meta_table->length);
 			do_something_random_xD(meta_table, result, l);
-		printf("meta_table->length 5 is %i\n",meta_table->length);
-
-			//print_meta_table(meta_table);
-			//printf("\n###\n\n");
 		}
 	}
 	return result;
