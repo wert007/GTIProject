@@ -331,7 +331,7 @@ void collect_essentials(list *meta_table, list *result, list *primeimplicants)
 				if (value == 1)
 					remove_column(meta_table, i);
 			}
-			remove_row(meta_table, index_of_last_found);
+			remove_at(meta_table, index_of_last_found);
 
 			if (is_meta_table_empty(meta_table))
 				return;
