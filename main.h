@@ -45,10 +45,12 @@ unsigned int count_ones(char_array component);
 void compare(list *current, list *next, list *meta_list, list *new_meta_list);
 bool is_off_by_one_bit(char_array *currentComponent, char_array *nextComponent);
 char_array *combine_components(char_array *currentComponent, char_array *nextComponent);
+void wrap_it_up(bool is_done, list * new_meta_list, list * result_list);
 
 bool a_can_be_converted_to_b(char_array *a, char_array *b);
 void remove_column(list *meta_table, int index);
 void remove_row(list *meta_table, int index);
+void remove_unimportant_rows_and_columns(list * meta_table);
 void remove_submissive_rows(list * meta_table); //( ͡° ͜ʖ ͡°)
 void remove_dominant_columns(list * meta_table); //( ͡° ͜ʖ ͡°)
 

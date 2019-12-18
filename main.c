@@ -173,7 +173,11 @@ list *do_the_phase_DOS(list *l, char_array2d *minterms)
 
 void remove_unimportant_rows_and_columns(list * meta_table)
 {
+	if(is_meta_table_empty(meta_table))
+		return;
 	remove_submissive_rows(meta_table);
+	if(is_meta_table_empty(meta_table))
+		return;
 	remove_dominant_columns(meta_table);
 }
 
