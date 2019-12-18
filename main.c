@@ -168,14 +168,24 @@ list *do_the_phase_DOS(list *primimplicants, char_array2d *minterms)
 	{
 		meta_table_length = meta_table->length;
 		//Collect essential implicants and transform table
+		print_meta_table(meta_table);
+		printf("1\n");
 		collect_essentials(meta_table, result, primimplicants);
+		print_meta_table(meta_table);
+		printf("2\n");
 		remove_unimportant_rows_and_columns(meta_table);
+		print_meta_table(meta_table);
+		printf("3\n");
 		//If we didn't find any essential primimplicants
 		//Remove just any element.
 		if (meta_table_length == meta_table->length)
 		{
 			choose_any_primimplicant(meta_table, result, primimplicants);
-			remove_unimportant_rows_and_columns(meta_table);
+			//printf("\n");
+			//remove_unimportant_rows_and_columns(meta_table);
+			print_meta_table(meta_table);
+
+			printf("4\n");
 		}
 	}
 	return result;
@@ -194,8 +204,8 @@ void remove_unimportant_rows_and_columns(list * meta_table)
 void choose_any_primimplicant(list *meta_table, list *result, list *primimplicants)
 {
 	//Choose the primimplicant, which covers the most values
-	int index = 0;
-	int max_ones = -1;
+	//int index = 0;
+	/*int max_ones = -1;
 	for(int i = 0; i < primimplicants->length; i++)
 	{
 		char_array * cur = get_at(primimplicants, i);
@@ -205,17 +215,19 @@ void choose_any_primimplicant(list *meta_table, list *result, list *primimplican
 			max_ones = ones;
 			index = i;
 		}
-	}
+	}*/
 	//Remove that primimplicant from the meta_table
-	char_array *l = pop(primimplicants, index);
+	char_array *l = pop(primimplicants, 0);
 	add_to_end(result, l);
-	list * cur = pop(meta_table, index);
+	list * cur = pop(meta_table, 0);
 	for (int i = cur->length - 1; i >= 0; i--)
 	{
 		char val = *(char*)get_at(cur, i);
 		if (val != 0)
 			remove_column(meta_table, i);
 	}
+	remove_at(meta_table,0);
+	remove_at(meta_table,0);
 }
 
 void remove_dominant_columns(list *meta_table) //(  ͡°  ͜ʖ  ͡° )
