@@ -57,7 +57,7 @@ void foo(char_array2d *args)
 
 	//print_map_debug(result_list);
 
-	list * r = do_the_phase_DOS(result_list, args); 
+	list *r = do_the_phase_DOS(result_list, args);
 	print_map(r);
 }
 
@@ -125,14 +125,14 @@ dontdothis:
 	}
 }
 
-bool is_meta_table_empty(list * meta_table)
+bool is_meta_table_empty(list *meta_table)
 {
-	if(meta_table->length == 0)
+	if (meta_table->length == 0)
 		return true;
-	for(int i = 0; i < meta_table->length; i++)
+	for (int i = 0; i < meta_table->length; i++)
 	{
-		list * current = get_at(meta_table, i);
-		if(current->length > 0)
+		list *current = get_at(meta_table, i);
+		if (current->length > 0)
 			return false;
 	}
 	return true;
@@ -152,82 +152,143 @@ void print_meta_table(list *meta_table)
 	}
 }
 
-list * do_the_phase_DOS(list *l, char_array2d *minterms)
+list *do_the_phase_DOS(list *l, char_array2d *minterms)
 {
 	list *meta_table = convert_to_table(l, minterms);
 
 	//Collects essential implicants and transforms table
 	list *result = create_empty_list();
 	int meta_table_length = -1;
-	while(!is_meta_table_empty(meta_table))
+	while (!is_meta_table_empty(meta_table))
 	{
 		meta_table_length = meta_table->length;
+		printf("init\n\n");
+		print_meta_table(meta_table);
+		printf("\n###\n\n");
 		collect_essentials(meta_table, result, l);
-		if(is_meta_table_empty(meta_table))
+		if (is_meta_table_empty(meta_table))
 			break;
+		printf("minus essentials\n\n");
+		print_meta_table(meta_table);
+		printf("\n###\n\n");
 		remove_submissive_rows(meta_table);
+		if (is_meta_table_empty(meta_table))
+			break;
+		printf("minus rows\n\n");
+		print_meta_table(meta_table);
+		printf("\n###\n\n");
 		remove_dominant_columns(meta_table);
-		if(meta_table_length == meta_table->length)
+		if (is_meta_table_empty(meta_table))
+			break;
+		printf("minus columns\n\n");
+		print_meta_table(meta_table);
+		printf("\n###\n\n");
+		if (meta_table_length == meta_table->length)
 		{
 			do_something_random_xD(meta_table, result, l);
+
+			printf("minus random\n\n");
+			print_meta_table(meta_table);
+			printf("\n###\n\n");
+			remove_submissive_rows(meta_table);
+			if (is_meta_table_empty(meta_table))
+				break;
+			printf("minus rows\n\n");
+			print_meta_table(meta_table);
+			printf("\n###\n\n");
+			remove_dominant_columns(meta_table);
+			if (is_meta_table_empty(meta_table))
+				break;
+			printf("minus columns\n\n");
+			print_meta_table(meta_table);
+			printf("\n###\n\n");
+
+			printf("\nminus random\n\n");
 		}
 	}
 	return result;
 }
 
-void do_something_random_xD(list * meta_table, list * result, list * primeimplicants)
+void do_something_random_xD(list *meta_table, list *result, list *primeimplicants)
 {
-	list *l = get_at(primeimplicants, 0);
+	//TODO: Remove the one primeimplicant, which
+	//has the most ones.
+	char_array *l = get_at(primeimplicants, 0);
+	remove_at(primeimplicants, 0);
 	add_to_end(result, l);
 	remove_at(meta_table, 0);
+	list * cur = get_at(meta_table, 0);
+	for (int i = cur->length - 1; i >= 0; i--)
+	{
+		char val = *(char*)get_at(cur, i);
+		if (val != 0)
+			remove_column(meta_table, i);
+	}
 }
 
-void remove_dominant_columns(list * meta_table) //(  ͡°  ͜ʖ  ͡° )
+void remove_dominant_columns(list *meta_table) //(  ͡°  ͜ʖ  ͡° )
 {
-	list * current = get_at(meta_table, 0);
-	for(int x = current->length - 1; x >= 0; x--)
+	list *current = get_at(meta_table, 0);
+	for (int x = current->length - 1; x >= 0; x--)
 	{
-		for(int x2 = current->length - 1; x2 >= 0; x2--)
+		for (int x2 = current->length - 1; x2 >= 0; x2--)
 		{
-			if(x == x2) continue;
+			if (x == x2)
+				continue;
 			bool should_be_removed = true;
-			for(int y = meta_table->length - 1; y >= 0; y--)
+			for (int y = meta_table->length - 1; y >= 0; y--)
 			{
 				current = get_at(meta_table, y);
 				char curVal = *(char *)get_at(current, x);
 				char othVal = *(char *)get_at(current, x2);
-				if(curVal == 0 && othVal == 1)
+				if (curVal == 0 && othVal == 1)
 				{
 					should_be_removed = false;
 				}
 			}
-			if(should_be_removed)
+			if (should_be_removed)
 			{
 				remove_column(meta_table, x);
 				break;
 			}
 		}
 	}
-}
-
-void remove_submissive_rows(list * meta_table) //( ͡° ͜ʖ ͡°)
-{
 	for(int i = meta_table->length - 1; i >= 0; i--)
 	{
-		list * current = get_at(meta_table, i);
-		for(int j = meta_table->length - 1; j >= 0; j--)
+		list * cur = get_at(meta_table, i);
+		bool found_one = false;
+		for(int j = 0; j < cur->length; j++)
 		{
-			if(j == i)	continue;
-			list * other = get_at(meta_table, j);
+			char val = *(char*)get_at(cur, j);
+			if(val == 1)
+				found_one = true;
+		}
+		if(!found_one)
+		{
+			remove_at(meta_table, i);
+		}
+	}
+}
+
+void remove_submissive_rows(list *meta_table) //( ͡° ͜ʖ ͡°)
+{
+	for (int i = meta_table->length - 1; i >= 0; i--)
+	{
+		list *current = get_at(meta_table, i);
+		for (int j = meta_table->length - 1; j >= 0; j--)
+		{
+			if (j == i)
+				continue;
+			list *other = get_at(meta_table, j);
 			bool should_be_removed = true;
-			for(int k = 0; k < current->length; k++)
+			for (int k = 0; k < current->length; k++)
 			{
 				char curElem = *(char *)get_at(current, k);
 				char othElem = *(char *)get_at(other, k);
-				if(curElem == 1 && othElem == 0)
+				if (curElem == 1 && othElem == 0)
 					should_be_removed = false;
 			}
-			if(should_be_removed)
+			if (should_be_removed)
 			{
 				//Remove current row.
 				remove_at(meta_table, i);
@@ -237,11 +298,10 @@ void remove_submissive_rows(list * meta_table) //( ͡° ͜ʖ ͡°)
 	}
 }
 
-
 //TODO: Are we allowed to change primeimplicnats? Would be better if we could.
 void collect_essentials(list *meta_table, list *result, list *primeimplicants)
 {
-	if(meta_table->length == 1)
+	if (meta_table->length == 1)
 	{
 		list *l = get_at(primeimplicants, 0);
 		remove_at(primeimplicants, 0);
@@ -260,13 +320,13 @@ void collect_essentials(list *meta_table, list *result, list *primeimplicants)
 	for (int x = current->length - 1; x >= 0; x--)
 	{
 		int ones_in_row = 0;
-		if(x>current->length-1)
-			x = current->length -1;
+		if (x > current->length - 1)
+			x = current->length - 1;
 		int index_of_last_found = -1;
 		for (int y = 0; y < meta_table->length; y++)
 		{
 			current = get_at(meta_table, y);
-			char val = *(char *)(get_at(current,x));
+			char val = *(char *)(get_at(current, x));
 			if (val == 1)
 			{
 
@@ -291,7 +351,7 @@ void collect_essentials(list *meta_table, list *result, list *primeimplicants)
 			}
 			remove_row(meta_table, index_of_last_found);
 
-			if(is_meta_table_empty(meta_table))
+			if (is_meta_table_empty(meta_table))
 				return;
 			current = get_at(meta_table, 0);
 		}
@@ -354,6 +414,8 @@ bool a_can_be_converted_to_b(char_array *a, char_array *b)
 	return true;
 }
 
+//We don't use this????									   |
+//														   v
 void compare(unsigned int ones, list *current, list *next, list *result_list, list *meta_list, list *new_meta_list)
 {
 	//Main Loop to compare elements
