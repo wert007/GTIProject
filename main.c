@@ -55,8 +55,6 @@ void foo(char_array2d *args)
 	}
 	do_the_phase_ONE(meta_list, result_list);
 
-	//print_map_debug(result_list);
-
 	list *r = do_the_phase_DOS(result_list, args);
 	print_map(r);
 }
@@ -162,48 +160,24 @@ list *do_the_phase_DOS(list *l, char_array2d *minterms)
 	while (!is_meta_table_empty(meta_table))
 	{
 		meta_table_length = meta_table->length;
-		printf("init\n\n");
-		print_meta_table(meta_table);
-		printf("\n###\n\n");
 		collect_essentials(meta_table, result, l);
 		if (is_meta_table_empty(meta_table))
 			break;
-		printf("minus essentials\n\n");
-		print_meta_table(meta_table);
-		printf("\n###\n\n");
 		remove_submissive_rows(meta_table);
 		if (is_meta_table_empty(meta_table))
 			break;
-		printf("minus rows\n\n");
-		print_meta_table(meta_table);
-		printf("\n###\n\n");
 		remove_dominant_columns(meta_table);
 		if (is_meta_table_empty(meta_table))
 			break;
-		printf("minus columns\n\n");
-		print_meta_table(meta_table);
-		printf("\n###\n\n");
 		if (meta_table_length == meta_table->length)
 		{
 			do_something_random_xD(meta_table, result, l);
-
-			printf("minus random\n\n");
-			print_meta_table(meta_table);
-			printf("\n###\n\n");
 			remove_submissive_rows(meta_table);
 			if (is_meta_table_empty(meta_table))
 				break;
-			printf("minus rows\n\n");
-			print_meta_table(meta_table);
-			printf("\n###\n\n");
 			remove_dominant_columns(meta_table);
 			if (is_meta_table_empty(meta_table))
 				break;
-			printf("minus columns\n\n");
-			print_meta_table(meta_table);
-			printf("\n###\n\n");
-
-			printf("\nminus random\n\n");
 		}
 	}
 	return result;
@@ -309,13 +283,6 @@ void collect_essentials(list *meta_table, list *result, list *primeimplicants)
 		remove_at(meta_table, 0);
 		return;
 	}
-	// list *conversion = create_empty_list();
-	// for (int i = 0; i < primeimplicants->length; i++)
-	// {
-	// 	int *copy = malloc(sizeof(int));
-	// 	copy[0] = i;
-	// 	add_to_end(conversion, copy);
-	// }
 	list *current = get_at(meta_table, 0);
 	for (int x = current->length - 1; x >= 0; x--)
 	{
@@ -375,7 +342,6 @@ void remove_column(list *meta_table, int index)
 list *convert_to_table(list *primeimplicants, char_array2d *minterms)
 {
 	list *result = create_empty_list();
-	//char_array2d * result = create_empty_char_array2d(minterms->length, primeimplicants->length);
 	for (int y = 0; y < primeimplicants->length; y++)
 	{
 		list *current = create_empty_list();
@@ -657,8 +623,10 @@ void remove_duplicates(list *l)
 		for (int j = l->length - 1; j > i; j--)
 		{
 			char_array *other = get_at(l, j);
-			if (equals(current, other) && i != j)
-				remove_at(l, i);
+			if (equals(current, other) && i != j){
+				remove_at(l, j);
+			}
+
 		}
 	}
 }
@@ -686,5 +654,5 @@ void print_map(list *results)
 			dont_care = 1;
 	}
 	if (dont_care != 0)
-		printf("it doesnt matter, always on :D\n");
+		printf("Don't care situation: Always on!\n");
 }
