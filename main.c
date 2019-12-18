@@ -185,11 +185,23 @@ void do_something_random_xD(list *meta_table, list *result, list *primeimplicant
 {
 	//TODO: Remove the one primeimplicant, which
 	//has the most ones.
-	char_array *l = get_at(primeimplicants, 0);
-	remove_at(primeimplicants, 0);
+	int index = 0;
+	int max_ones = -1;
+	for(int i = 0; i < primeimplicants->length; i++)
+	{
+		char_array * cur = get_at(primeimplicants, i);
+		int ones = count_ones(*cur);
+		if(ones > max_ones)
+		{
+			max_ones = ones;
+			index = i;
+		}
+	}
+	char_array *l = get_at(primeimplicants, index);
+	remove_at(primeimplicants, index);
 	add_to_end(result, l);
-	remove_at(meta_table, 0);
-	list * cur = get_at(meta_table, 0);
+	list * cur = get_at(meta_table, index);
+	remove_at(meta_table, index);
 	for (int i = cur->length - 1; i >= 0; i--)
 	{
 		char val = *(char*)get_at(cur, i);
