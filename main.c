@@ -95,32 +95,29 @@ void do_the_phase_ONE(list *meta_list, list *result_list)
 			char_array *comp_arr = get_at(comp_list, j);
 			if (comp_arr->has_been_compared)
 			{
-				wrap_it_up(true, new_meta_list, result_list);
+				wrap_it_up(false, new_meta_list, result_list);
 				return;
 			}
 		}
 	}
-	wrap_it_up(false, new_meta_list, result_list);
+	wrap_it_up(true, new_meta_list, result_list);
 }
 
-void wrap_it_up(bool success, list * new_meta_list, list * result_list)
+void wrap_it_up(bool is_done, list * new_meta_list, list * result_list)
 {
-	if (success)
-	{
-		do_the_phase_ONE(new_meta_list, result_list);
-	}
-	else
+	if(is_done)
 	{
 		for (int i = 0; i < new_meta_list->length; i++)
 		{
 			list *current = get_at(new_meta_list, i);
 			for (int j = 0; j < current->length; j++)
-			{
 				add_to_end(result_list, get_at(current, j));
-			}
 		}
 		remove_duplicates(result_list);
 	}
+	else
+		do_the_phase_ONE(new_meta_list, result_list);
+	
 }
 
 bool is_meta_table_empty(list *meta_table)
