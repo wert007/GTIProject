@@ -82,12 +82,10 @@ void do_the_phase_ONE(list *meta_list, list *result_list)
 		list *current = get_at(meta_list, i);
 		list *next = get_at(meta_list, i + 1);
 		compare(current, next, meta_list, new_meta_list);
-		//remove_duplicates_meta(new_meta_list);
 	}
 	//checks for last element if it was compared
 	list *current = get_at(meta_list, (meta_list->length - 1));
 	compare(current, create_empty_list(), meta_list, new_meta_list);
-	//remove_duplicates_meta(new_meta_list);
 
 	//Loop to check, if at least one element has been compared
 	for (int i = 0; i < meta_list->length; i++)
