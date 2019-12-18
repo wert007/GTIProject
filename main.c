@@ -57,7 +57,7 @@ void foo(char_array2d *args)
 
 	//print_map_debug(result_list);
 
-	list * r = do_the_phase_DOS(result_list, args); //T O D O
+	list * r = do_the_phase_DOS(result_list, args); 
 	print_map(r);
 }
 
@@ -155,6 +155,7 @@ void print_meta_table(list *meta_table)
 list * do_the_phase_DOS(list *l, char_array2d *minterms)
 {
 	list *meta_table = convert_to_table(l, minterms);
+	printf("1\n");
 
 	//Collects essential implicants and transforms table
 	list *result = create_empty_list();
@@ -162,18 +163,27 @@ list * do_the_phase_DOS(list *l, char_array2d *minterms)
 	while(!is_meta_table_empty(meta_table))
 	{
 		meta_table_length = meta_table->length;
+		printf("meta_table_length is %i\n",meta_table_length);
+		printf("meta_table->length -1 is %i\n",meta_table->length);
 		collect_essentials(meta_table, result, l);
-		print_meta_table(meta_table);
-			printf("\n###\n\n");
+		printf("meta_table->length is %i\n",meta_table->length);
+		//print_meta_table(meta_table);
+			//printf("\n###\n\n");
 		if(is_meta_table_empty(meta_table))
 			break;
 		remove_submissive_rows(meta_table);
+		printf("meta_table->length 2 is %i\n",meta_table->length);
+
 		remove_dominant_columns(meta_table);
+		printf("meta_table->length 3 is %i\n",meta_table->length);
 		if(meta_table_length == meta_table->length)
 		{
+		printf("meta_table->length 4 is %i\n",meta_table->length);
 			do_something_random_xD(meta_table, result, l);
-			print_meta_table(meta_table);
-			printf("\n###\n\n");
+		printf("meta_table->length 5 is %i\n",meta_table->length);
+
+			//print_meta_table(meta_table);
+			//printf("\n###\n\n");
 		}
 	}
 	return result;
@@ -264,11 +274,13 @@ void collect_essentials(list *meta_table, list *result, list *primeimplicants)
 	for (int x = current->length - 1; x >= 0; x--)
 	{
 		int ones_in_row = 0;
+		if(x>current->length-1)
+			x = current->length -1;
 		int index_of_last_found = -1;
 		for (int y = 0; y < meta_table->length; y++)
 		{
 			current = get_at(meta_table, y);
-			char val = *(char *)(get_at(current, x));
+			char val = *(char *)(get_at(current,x));
 			if (val == 1)
 			{
 
@@ -276,6 +288,7 @@ void collect_essentials(list *meta_table, list *result, list *primeimplicants)
 				index_of_last_found = y;
 			}
 		}
+
 		if (ones_in_row == 1)
 		{
 			list *l = get_at(primeimplicants, index_of_last_found);
