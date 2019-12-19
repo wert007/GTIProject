@@ -51,12 +51,12 @@ void wrap_it_up(bool is_done, list * new_meta_list, list * result_list);
 
 bool a_covers_b(char_array *a, char_array *b);
 void remove_column(list *meta_table, int index);
-void remove_unimportant_rows_and_columns(list * meta_table, list * primimplicant);
-void remove_submissive_rows(list * meta_table, list * primimplicant); //( ͡° ͜ʖ ͡°)
-void remove_dominant_columns(list * meta_table, list * primimplicant); //( ͡° ͜ʖ ͡°)
+void remove_unimportant_rows_and_columns(list * meta_table, list * primeimplicant);
+void remove_submissive_rows(list * meta_table, list * primeimplicant); //( ͡° ͜ʖ ͡°)
+void remove_dominant_columns(list * meta_table, list * primeimplicant); //( ͡° ͜ʖ ͡°)
 
 bool is_meta_table_empty(list * meta_table);
-void choose_any_primimplicant(list * meta_table, list * result, list * primeimplicants);
+void choose_any_primeimplicant(list * meta_table, list * result, list * primeimplicants);
 
 void collect_essentials(list *meta_table, list *result, list *primeimplicants);
 
