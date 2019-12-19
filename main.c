@@ -110,9 +110,6 @@ void simplify_function(char_array2d *args)
 
 void phase_one(list *meta_list, list *result_list)
 {
-	//TODO: Is this if ever true?
-	if (meta_list->length == 0)
-		return;
 	//Reset Loop
 	for (int i = 0; i < meta_list->length; i++)
 	{
@@ -202,10 +199,10 @@ void print_meta_table(list *meta_table)
 	}
 }
 
-list *phase_two(list *primimplicants, char_array2d *minterms)
+list *phase_two(list *primeimplicants, char_array2d *minterms)
 {
-	//Convert our primimplicants and the minterms into one table
-	list *meta_table = convert_to_table(primimplicants, minterms);
+	//Convert our primeimplicants and the minterms into one table
+	list *meta_table = convert_to_table(primeimplicants, minterms);
 
 	list *result = create_empty_list();
 	int meta_table_length = -1;
@@ -213,13 +210,13 @@ list *phase_two(list *primimplicants, char_array2d *minterms)
 	{
 		meta_table_length = meta_table->length;
 		//Collect essential implicants and transform table
-		collect_essentials(meta_table, result, primimplicants);
-		remove_unimportant_rows_and_columns(meta_table, primimplicants);
-		//If we didn't find any essential primimplicants
+		collect_essentials(meta_table, result, primeimplicants);
+		remove_unimportant_rows_and_columns(meta_table, primeimplicants);
+		//If we didn't find any essential primeimplicants
 		//Remove just any element.
 		if (meta_table_length == meta_table->length)
 		{
-			choose_any_primimplicant(meta_table, result, primimplicants);
+			choose_any_primeimplicant(meta_table, result, primeimplicants);
 
 			//remove_unimportant_rows_and_columns(meta_table);
 
@@ -228,24 +225,24 @@ list *phase_two(list *primimplicants, char_array2d *minterms)
 	return result;
 }
 
-void remove_unimportant_rows_and_columns(list *meta_table, list * primimplicants)
+void remove_unimportant_rows_and_columns(list *meta_table, list * primeimplicants)
 {
 	if (is_meta_table_empty(meta_table))
 		return;
-	remove_submissive_rows(meta_table, primimplicants);
+	remove_submissive_rows(meta_table, primeimplicants);
 	if (is_meta_table_empty(meta_table))
 		return;
-	remove_dominant_columns(meta_table, primimplicants);
+	remove_dominant_columns(meta_table, primeimplicants);
 }
 
-void choose_any_primimplicant(list *meta_table, list *result, list *primimplicants)
+void choose_any_primeimplicant(list *meta_table, list *result, list *primeimplicants)
 {
-	//Choose the primimplicant, which covers the most values
+	//Choose the primeimplicant, which covers the most values
 	int index = 0;
 	int max_ones = -1;
-	for(int i = 0; i < primimplicants->length; i++)
+	for(int i = 0; i < primeimplicants->length; i++)
 	{
-		char_array * cur = get_at(primimplicants, i);
+		char_array * cur = get_at(primeimplicants, i);
 		int ones = count_ones(*cur);
 		if(ones > max_ones)
 		{
@@ -253,8 +250,8 @@ void choose_any_primimplicant(list *meta_table, list *result, list *primimplican
 			index = i;
 		}
 	}
-	//Remove that primimplicant from the meta_table
-	char_array *l = pop(primimplicants, index);
+	//Remove that primeimplicant from the meta_table
+	char_array *l = pop(primeimplicants, index);
 	add_to_end(result, l);
 	list *cur = pop(meta_table, index);
 	for (int i = cur->length - 1; i >= 0; i--)
@@ -267,7 +264,7 @@ void choose_any_primimplicant(list *meta_table, list *result, list *primimplican
 	}
 }
 
-void remove_dominant_columns(list *meta_table, list * primimplicant) //(  ͡°  ͜ʖ  ͡° )
+void remove_dominant_columns(list *meta_table, list * primeimplicant) //(  ͡°  ͜ʖ  ͡° )
 {
 	list *current = get_at(meta_table, 0);
 	//Loop to compare all columns with all other columns
@@ -307,12 +304,12 @@ void remove_dominant_columns(list *meta_table, list * primimplicant) //(  ͡°  
 		if (!found_one)
 		{
 			remove_at(meta_table, i);
-			remove_at(primimplicant, i);
+			remove_at(primeimplicant, i);
 		}
 	}
 }
 
-void remove_submissive_rows(list *meta_table, list * primimplicant) //( ͡° ͜ʖ ͡°)
+void remove_submissive_rows(list *meta_table, list * primeimplicant) //( ͡° ͜ʖ ͡°)
 {
 	for (int i = meta_table->length - 1; i >= 0; i--)
 	{
@@ -333,7 +330,7 @@ void remove_submissive_rows(list *meta_table, list * primimplicant) //( ͡° ͜�
 			if (should_be_removed)
 			{
 				remove_at(meta_table, i);
-				remove_at(primimplicant, i);
+				remove_at(primeimplicant, i);
 				break;
 			}
 		}
@@ -409,6 +406,7 @@ void remove_column(list *meta_table, int index)
 list *convert_to_table(list *primeimplicants, char_array2d *minterms)
 {
 	list *result = create_empty_list();
+	//For each prim
 	for (int y = 0; y < primeimplicants->length; y++)
 	{
 		list *current = create_empty_list();
