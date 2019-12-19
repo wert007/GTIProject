@@ -16,33 +16,32 @@ void parse_args(int argc, char **argv, char_array2d **values)
 	(*values)->length = length;
 	(*values)->data = malloc(length * sizeof(char_array *));
 	unsigned int minterm_length = 0;
-	for(int i = 0; i < length; i++)
+	for (int i = 0; i < length; i++)
 	{
-		char * cur_argv = argv[i + 1];
-		for(int j = 0; cur_argv[j]; j++)
+		char *cur_argv = argv[i + 1];
+		for (int j = 0; cur_argv[j]; j++)
 		{
 			int val = tolower(cur_argv[j]) - 'a' + 1;
-			if(val > minterm_length)
+			if (val > minterm_length)
 				minterm_length = val;
 		}
 	}
-	for(int i = 0; i < length; i++)
+	for (int i = 0; i < length; i++)
 	{
 		char_array *cur = malloc(sizeof(char_array));
 		cur->length = minterm_length;
 		cur->has_been_compared = false;
 		cur->data = malloc(minterm_length * sizeof(char));
-		for(int j = 0; j < minterm_length; j++)
+		for (int j = 0; j < minterm_length; j++)
 			cur->data[j] = 2;
-		for(int j = 0; argv[i + 1][j]; j++)
+		for (int j = 0; argv[i + 1][j]; j++)
 		{
 			char c = argv[i + 1][j];
 			int index = tolower(c) - 'a';
-			if(c >= 'A' && c <= 'Z')
+			if (c >= 'A' && c <= 'Z')
 				cur->data[index] = 1;
-			else if(c >= 'a' && c <= 'z')
+			else if (c >= 'a' && c <= 'z')
 				cur->data[index] = 0;
-
 		}
 		(*values)->data[i] = cur;
 	}
@@ -148,9 +147,9 @@ void do_the_phase_ONE(list *meta_list, list *result_list)
 	wrap_it_up(true, new_meta_list, result_list);
 }
 
-void wrap_it_up(bool is_done, list * new_meta_list, list * result_list)
+void wrap_it_up(bool is_done, list *new_meta_list, list *result_list)
 {
-	if(is_done)	//We didn't compare anything with eachother, so we can stop now
+	if (is_done) //We didn't compare anything with eachother, so we can stop now
 	{
 		//Loop to collect result and add them to result_list
 		for (int i = 0; i < new_meta_list->length; i++)
@@ -208,44 +207,36 @@ list *do_the_phase_DOS(list *primimplicants, char_array2d *minterms)
 	{
 		meta_table_length = meta_table->length;
 		//Collect essential implicants and transform table
-		print_meta_table(meta_table);
-		printf("1\n");
 		collect_essentials(meta_table, result, primimplicants);
-		print_meta_table(meta_table);
-		printf("2\n");
-		remove_unimportant_rows_and_columns(meta_table);
-		print_meta_table(meta_table);
-		printf("3\n");
+		remove_unimportant_rows_and_columns(meta_table, primimplicants);
 		//If we didn't find any essential primimplicants
 		//Remove just any element.
 		if (meta_table_length == meta_table->length)
 		{
 			choose_any_primimplicant(meta_table, result, primimplicants);
-			//printf("\n");
-			//remove_unimportant_rows_and_columns(meta_table);
-			print_meta_table(meta_table);
 
-			printf("4\n");
+			//remove_unimportant_rows_and_columns(meta_table);
+
 		}
 	}
 	return result;
 }
 
-void remove_unimportant_rows_and_columns(list * meta_table)
+void remove_unimportant_rows_and_columns(list *meta_table, list * primimplicants)
 {
-	if(is_meta_table_empty(meta_table))
+	if (is_meta_table_empty(meta_table))
 		return;
-	remove_submissive_rows(meta_table);
-	if(is_meta_table_empty(meta_table))
+	remove_submissive_rows(meta_table, primimplicants);
+	if (is_meta_table_empty(meta_table))
 		return;
-	remove_dominant_columns(meta_table);
+	remove_dominant_columns(meta_table, primimplicants);
 }
 
 void choose_any_primimplicant(list *meta_table, list *result, list *primimplicants)
 {
 	//Choose the primimplicant, which covers the most values
-	//int index = 0;
-	/*int max_ones = -1;
+	int index = 0;
+	int max_ones = -1;
 	for(int i = 0; i < primimplicants->length; i++)
 	{
 		char_array * cur = get_at(primimplicants, i);
@@ -255,22 +246,22 @@ void choose_any_primimplicant(list *meta_table, list *result, list *primimplican
 			max_ones = ones;
 			index = i;
 		}
-	}*/
+	}
 	//Remove that primimplicant from the meta_table
-	char_array *l = pop(primimplicants, 0);
+	char_array *l = pop(primimplicants, index);
 	add_to_end(result, l);
-	list * cur = pop(meta_table, 0);
+	list *cur = pop(meta_table, index);
 	for (int i = cur->length - 1; i >= 0; i--)
 	{
-		char val = *(char*)get_at(cur, i);
+		char val = *(char *)get_at(cur, i);
 		if (val != 0)
+		{
 			remove_column(meta_table, i);
+		}
 	}
-	remove_at(meta_table,0);
-	remove_at(meta_table,0);
 }
 
-void remove_dominant_columns(list *meta_table) //(  ͡°  ͜ʖ  ͡° )
+void remove_dominant_columns(list *meta_table, list * primimplicant) //(  ͡°  ͜ʖ  ͡° )
 {
 	list *current = get_at(meta_table, 0);
 	//Loop to compare all columns with all other columns
@@ -297,22 +288,25 @@ void remove_dominant_columns(list *meta_table) //(  ͡°  ͜ʖ  ͡° )
 		}
 	}
 	//Removes "0"-rows
-	for(int i = meta_table->length - 1; i >= 0; i--)
+	for (int i = meta_table->length - 1; i >= 0; i--)
 	{
-		list * cur = get_at(meta_table, i);
+		list *cur = get_at(meta_table, i);
 		bool found_one = false;
-		for(int j = 0; j < cur->length; j++)
+		for (int j = 0; j < cur->length; j++)
 		{
-			char val = *(char*)get_at(cur, j);
-			if(val == 1)
+			char val = *(char *)get_at(cur, j);
+			if (val == 1)
 				found_one = true;
 		}
-		if(!found_one)
+		if (!found_one)
+		{
 			remove_at(meta_table, i);
+			remove_at(primimplicant, i);
+		}
 	}
 }
 
-void remove_submissive_rows(list *meta_table) //( ͡° ͜ʖ ͡°)
+void remove_submissive_rows(list *meta_table, list * primimplicant) //( ͡° ͜ʖ ͡°)
 {
 	for (int i = meta_table->length - 1; i >= 0; i--)
 	{
@@ -333,6 +327,7 @@ void remove_submissive_rows(list *meta_table) //( ͡° ͜ʖ ͡°)
 			if (should_be_removed)
 			{
 				remove_at(meta_table, i);
+				remove_at(primimplicant, i);
 				break; //TODO: Could that be our error?
 			}
 		}
@@ -357,7 +352,9 @@ void collect_essentials(list *meta_table, list *result, list *primeimplicants)
 	{
 		int ones_in_row = 0;
 		if (x > current->length - 1)
+		{
 			x = current->length - 1;
+		}
 		int index_of_last_found = -1;
 		for (int y = 0; y < meta_table->length; y++)
 		{
@@ -380,8 +377,11 @@ void collect_essentials(list *meta_table, list *result, list *primeimplicants)
 			for (int i = row->length - 1; i >= 0; i--)
 			{
 				char value = *(char *)get_at(row, i);
-				if (value == 1)
+				if (value == 1){
 					remove_column(meta_table, i);
+					//TODO: Hacky
+					x--;
+				}
 			}
 			remove_at(meta_table, index_of_last_found);
 
@@ -667,9 +667,9 @@ void remove_at(list *l, unsigned int i)
 		l->length = l->length - 1;
 }
 
-void * pop(list * l, unsigned int i)
+void *pop(list *l, unsigned int i)
 {
-	void * result = get_at(l, i);
+	void *result = get_at(l, i);
 	remove_at(l, i);
 	return result;
 }
