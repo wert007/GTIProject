@@ -99,16 +99,16 @@ void simplify_function(char_array2d *args)
 		int ones = count_ones(*args->data[i]);
 		add_to_meta_list_at(ones, meta_list, args->data[i]);
 	}
-	do_the_phase_ONE(meta_list, result_list);
+	phase_one(meta_list, result_list);
 
-	list *r = do_the_phase_DOS(result_list, args);
+	list *r = phase_two(result_list, args);
 	print_map(r);
 	free_meta_list(meta_list);
 	free_list(result_list);
 	free_list(r);
 }
 
-void do_the_phase_ONE(list *meta_list, list *result_list)
+void phase_one(list *meta_list, list *result_list)
 {
 	//TODO: Is this if ever true?
 	if (meta_list->length == 0)
@@ -168,7 +168,7 @@ void wrap_it_up(bool is_done, list *new_meta_list, list *result_list)
 		remove_duplicates(result_list);
 	}
 	else
-		do_the_phase_ONE(new_meta_list, result_list);
+		phase_one(new_meta_list, result_list);
 }
 
 bool is_meta_table_empty(list *meta_table)
@@ -202,7 +202,7 @@ void print_meta_table(list *meta_table)
 	}
 }
 
-list *do_the_phase_DOS(list *primimplicants, char_array2d *minterms)
+list *phase_two(list *primimplicants, char_array2d *minterms)
 {
 	//Convert our primimplicants and the minterms into one table
 	list *meta_table = convert_to_table(primimplicants, minterms);
