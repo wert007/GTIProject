@@ -63,10 +63,10 @@ void collect_essentials(list *meta_table, list *result, list *primeimplicants);
 list *convert_to_table(list *primeimplicants, char_array2d *minterms);
 void add_to_meta_list_at(unsigned int index, list *base, char_array *data);
 
-void foo(char_array2d *args);
+void simplify_function(char_array2d *args);
 void do_the_phase_ONE(list *meta_list, list *);
 list * do_the_phase_DOS(list *l, char_array2d *minterms);
-void parse_args(int argc, char **argv, char_array2d **values);
+bool parse_args(int argc, char **argv, char_array2d **values);
 
 void print_char_array(char_array *arr);
 void print_map(list *);

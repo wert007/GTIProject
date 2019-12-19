@@ -1,17 +1,22 @@
-//lol
 #include "main.h"
 
 int main(int argc, char **argv)
 {
 	char_array2d *values;
-	parse_args(argc, argv, &values); //TODO: wert007
-	foo(values);
+	if(!parse_args(argc, argv, &values))
+	{
+		fprintf(stderr, "Please enter your minterms in the AcD format.\n");
+		return 1;
+	}
+	simplify_function(values);
 	return 0;
 }
 
-void parse_args(int argc, char **argv, char_array2d **values)
+bool parse_args(int argc, char **argv, char_array2d **values)
 {
 	int length = argc - 1;
+	if(length == 0)
+		return false;
 	*values = malloc(sizeof(char_array2d));
 	(*values)->length = length;
 	(*values)->data = malloc(length * sizeof(char_array *));
@@ -22,6 +27,8 @@ void parse_args(int argc, char **argv, char_array2d **values)
 		for (int j = 0; cur_argv[j]; j++)
 		{
 			int val = tolower(cur_argv[j]) - 'a' + 1;
+			if(val < 0 || val > 26)
+				return false;
 			if (val > minterm_length)
 				minterm_length = val;
 		}
@@ -45,45 +52,45 @@ void parse_args(int argc, char **argv, char_array2d **values)
 		}
 		(*values)->data[i] = cur;
 	}
+	return true;
 }
 
-void _parse_args(int argc, char **argv, char_array2d **values)
-{
-	int length = argc - 1;
-	*values = malloc(sizeof(char_array2d));
-	(*values)->length = length;
-	(*values)->data = malloc(length * sizeof(char_array *));
-	for (int i = 0; i < length; i++)
-	{
-		char_array *cur = malloc(sizeof(char_array));
-		cur->length = strlen(argv[i + 1]);
-		cur->has_been_compared = false;
-		//HOW DOES THIS EVEN WORK?? THAT'S A COMPLETELY DIFFERENT LENGTH?!
-		cur->data = calloc(length, sizeof(char));
-		for (int c = 0; c < cur->length; c++)
-		{
-			switch (argv[i + 1][c])
-			{
-			//TODO: Use aBCde
-			case '1':
-				cur->data[c] = 1;
-				break;
-			case '0':
-				cur->data[c] = 0;
-				break;
-			case '-':
-				cur->data[c] = 2;
-				break;
-			default:
-				printf(">%d<", argv[i + 1][c]);
-				break;
-			}
-		}
-		(*values)->data[i] = cur;
-	}
-}
+// void _parse_args(int argc, char **argv, char_array2d **values)
+// {
+// 	int length = argc - 1;
+// 	*values = malloc(sizeof(char_array2d));
+// 	(*values)->length = length;
+// 	(*values)->data = malloc(length * sizeof(char_array *));
+// 	for (int i = 0; i < length; i++)
+// 	{
+// 		char_array *cur = malloc(sizeof(char_array));
+// 		cur->length = strlen(argv[i + 1]);
+// 		cur->has_been_compared = false;
+// 		//HOW DOES THIS EVEN WORK?? THAT'S A COMPLETELY DIFFERENT LENGTH?!
+// 		cur->data = calloc(length, sizeof(char));
+// 		for (int c = 0; c < cur->length; c++)
+// 		{
+// 			switch (argv[i + 1][c])
+// 			{
+// 			case '1':
+// 				cur->data[c] = 1;
+// 				break;
+// 			case '0':
+// 				cur->data[c] = 0;
+// 				break;
+// 			case '-':
+// 				cur->data[c] = 2;
+// 				break;
+// 			default:
+// 				printf(">%d<", argv[i + 1][c]);
+// 				break;
+// 			}
+// 		}
+// 		(*values)->data[i] = cur;
+// 	}
+// }
 
-void foo(char_array2d *args)
+void simplify_function(char_array2d *args)
 {
 	list *meta_list = create_empty_list();
 	list *result_list = create_empty_list();
@@ -96,10 +103,9 @@ void foo(char_array2d *args)
 
 	list *r = do_the_phase_DOS(result_list, args);
 	print_map(r);
-	//TODO:
-	//free_meta_list(meta_list);
-	//free_list(result_list);
-	//free_list(r);
+	free_meta_list(meta_list);
+	free_list(result_list);
+	free_list(r);
 }
 
 void do_the_phase_ONE(list *meta_list, list *result_list)
@@ -328,7 +334,7 @@ void remove_submissive_rows(list *meta_table, list * primimplicant) //( ͡° ͜�
 			{
 				remove_at(meta_table, i);
 				remove_at(primimplicant, i);
-				break; //TODO: Could that be our error?
+				break;
 			}
 		}
 	}
@@ -379,7 +385,6 @@ void collect_essentials(list *meta_table, list *result, list *primeimplicants)
 				char value = *(char *)get_at(row, i);
 				if (value == 1){
 					remove_column(meta_table, i);
-					//TODO: Hacky
 					x--;
 				}
 			}
